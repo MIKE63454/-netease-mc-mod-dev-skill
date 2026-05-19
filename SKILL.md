@@ -183,28 +183,138 @@ msg = serverApi.CreateComponent(serverApi.GetLevelId(), "Minecraft", "msg")
 msg.NotifyOneMessage(playerId, "message", "§e")
 ```
 
+## Common Patterns
+
+### Server ↔ Client Communication (Custom Events)
+
+Server and client cannot import each other's code. Use custom events for cross-side communication.
+
+**Server → Client:**
+```python
+# Server side: send data to a specific player
+self.NotifyToClient(playerId, "MyMod_ShowTip", {"msg": "Boss defeated!", "color": "§c"})
+
+# Client side: listen for the custom event
+def ListenEvent(self):
+    self.ListenForEvent("MyMod", "MyClientSystem",
+        "MyMod_ShowTip",
+        self, self.OnShowTip)
+
+def OnShowTip(self, args):
+    msg = args["msg"]
+    color = args["color"]
+    # Show UI tip, play sound, etc.
+```
+
+**Client → Server:**
+```python
+# Client side: send request to server
+self.NotifyToServer("MyMod_RequestItem", {"item": "diamond_sword"})
+
+# Server side: listen for the custom event
+def ListenEvent(self):
+    self.ListenForEvent("MyMod", "MyServerSystem",
+        "MyMod_RequestItem",
+        self, self.OnRequestItem)
+
+def OnRequestItem(self, args):
+    playerId = args.get("__id__")  # Auto-injected by engine
+    itemName = args["item"]
+    # Handle the request
+```
+
+### Tick Update Loop
+
+For per-frame logic (movement, timers, state machines):
+
+```python
+def ListenEvent(self):
+    self.ListenForEvent(
+        serverApi.GetEngineNamespace(), serverApi.GetEngineSystemName(),
+        "OnScriptTickServer",
+        self, self.OnTick
+    )
+
+def OnTick(self, args):
+    # Called 30 times per second
+    # Keep logic lightweight — heavy ops cause lag
+    pass
+```
+
+### Data Persistence (Save/Load)
+
+Use `extraData` component to persist data across game sessions:
+
+```python
+# Save data
+comp = serverApi.GetEngineCompFactory().CreateExtraData(entityId)
+comp.SetExtraData("myKey", value)          # Simple key-value
+comp.SetExtraData("myDict", {"a": 1})      # Dict OK
+comp.SaveExtraData()                        # Commit to disk
+
+# Load data
+comp = serverApi.GetEngineCompFactory().CreateExtraData(entityId)
+value = comp.GetExtraData("myKey")          # Returns value or None
+allData = comp.GetAllExtraData()            # Returns dict of all saved keys
+```
+
+> `entityId` for player-specific data: use `playerId`. For world-level data: use `levelId`.
+
+### Custom Items / Blocks (Python Side)
+
+Custom items/blocks defined in JSON still need Python for interactive behavior:
+
+```python
+# Custom block interaction
+def ListenEvent(self):
+    self.ListenForEvent(
+        serverApi.GetEngineNamespace(), serverApi.GetEngineSystemName(),
+        "ServerBlockUseEvent",
+        self, self.OnBlockUse
+    )
+
+def OnBlockUse(self, args):
+    blockName = args["blockName"]
+    playerId = args["playerId"]
+    # Check against your custom block's identifier
+    if blockName == "mymod:custom_block":
+        comp = serverApi.GetEngineCompFactory().CreateItem(playerId)
+        comp.SpawnItemToPlayerInv(
+            {"itemName": "minecraft:diamond", "count": 1, "auxValue": 0},
+            playerId
+        )
+```
+
+```python
+# Custom item usage detection (via chat or other trigger)
+# Custom items use namespace:name identifiers
+itemDict = {"itemName": "mymod:custom_sword", "count": 1, "auxValue": 0}
+```
+
 ## Commonly Used Events
 
-### Server-Side Events
+### Server-Side Events (Top 8)
 
 | Event Name | Trigger | Key args |
 |---|---|---|
 | `AddServerPlayerEvent` | Player joins | `id` (playerId) |
-| `ServerChatEvent` | Player sends chat | `message`, `playerId` |
-| `PlayerRespawnEvent` | Player respawns | `id`, `name` |
-| `PlayerDieEvent` | Player dies | `id` |
-| `ServerBlockUseEvent` | Player interacts with block | `blockName`, `playerId` |
-| `EntityHurtEvent` | Entity takes damage | `id`, `srcId`, `damage` |
-| `AddEntityServerEvent` | Entity created/loaded | `id`, `engineTypeStr` |
+| `ServerChatEvent` | Player sends chat | `message`, `playerId`, `cancel`, `bChatById` |
+| `PlayerHurtEvent` | Player takes damage | `id`, `attacker`, `cause` |
+| `PlayerDieEvent` | Player dies | `id`, `attacker`, `cause` |
+| `PlayerRespawnFinishServerEvent` | Player respawn complete (safe) | `playerId` |
+| `ServerBlockUseEvent` | Player interacts with block | `blockName`, `playerId`, `x/y/z` |
+| `AddEntityServerEvent` | Entity created/loaded | `id`, `engineTypeStr`, `posX/Y/Z` |
 | `ClientLoadAddonsFinishServerEvent` | Client mod loading done | — trigger client data init |
 
-### Client-Side Events
+### Client-Side Events (Top 3)
 
 | Event Name | Trigger | Key args |
 |---|---|---|
 | `OnLocalPlayerStopLoading` | Player fully loaded | `id` |
 | `AddEntityClientEvent` | Entity created (client) | `id`, `engineTypeStr` |
-| `OnScriptTickClient` | Every frame (30/sec) | — |
+| `OnScriptTickClient` | Every frame (variable) | — |
+
+> Full event reference with all parameters: see [[api-events]]
 
 ## Color Codes
 
@@ -273,6 +383,21 @@ No IDE breakpoint support. Debug entirely via log output. Hot-reload works for *
 | Cross-importing ServerSystem from ClientSystem | Use custom events for cross-side communication |
 | Nesting `modMain.py` in a subfolder | Place it directly in the scripts root folder |
 | Using bare `print` for logging | Use `from mod_log import logger` |
+
+## Troubleshooting
+
+| Symptom | Likely Cause | Fix |
+|---|---|---|
+| `ImportError: No module named mod_log` | Python env missing SDK stub | `pip install mc-netease-sdk` in Python 2 |
+| `System not registered` or mod not loading | `RegisterSystem` path doesn't match file structure | Verify triple match: `ScriptsFolder.fileName.ClassName` |
+| Mod works on PC but not mobile | `modMain.py` not at scripts root | Move `modMain.py` directly into `[Name]Scripts/` folder |
+| Hot-reload doesn't pick up changes | Changed global var, new class, or new file | Save → exit to menu → re-enter world |
+| `AttributeError: 'NoneType' object has no attribute` | `GetComponent` returned None | Check entity exists; use `CreateComponent` first |
+| Event callback never fires | Wrong event name or system name | Use exact event name from docs; verify `GetEngineSystemName()` |
+| Server component not working on client | Server/client isolation violated | Move logic to correct side; use custom events if cross-side |
+| `KeyError` in event callback | Event param name differs from docs | Check [[api-events]] for exact parameter names |
+| Chinese text garbled in logs | Missing UTF-8 header | Add `# -*- coding: utf-8 -*-` at top of file |
+| Mod works in editor but not after publish | UUID collision or missing files | Regenerate UUIDs; verify all files included in pack |
 
 ## Manifest Format
 
