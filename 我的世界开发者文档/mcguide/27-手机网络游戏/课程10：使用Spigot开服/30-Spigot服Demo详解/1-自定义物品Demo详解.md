@@ -1,0 +1,219 @@
+# 自定义物品Demo详解
+
+## 前置知识
+
+[Spigot服自定义物品原理简介](</dev/mcmanual/mc-dev/mcguide/27-手机网络游戏/课程10：使用Spigot开服/22-Spigot服自定义物品原理简介.html>)
+
+### DEMO详解
+
+[示例Demo](</dev/mcmanual/mc-dev/mcguide/27-手机网络游戏/课程10：使用Spigot开服/99-下载内容.html#示例demo>)中的CustomItemDemo包含了客户端mod及spigot插件。
+
+Demo实现了11个不同的自定义物品：
+
+  * 剑 (customitem:item_1)
+
+当鼠标右键方块时，方块所在位置发生半径为1.5格的爆炸
+
+  * 斧 (customitem:item_2)
+
+当鼠标右键方块时，方块所在位置出现落雷效果，并随机生成物品，必定掉落**铲**
+
+  * 铲 (customitem:item_3)
+
+当鼠标右键方块时，方块所在位置出现落雷效果，并随机生成物品，必定掉落**剩余自定义物品**
+
+  * 锄 (customitem:item_4)
+
+自定义物品的耐久度, 2/60(剩余耐久/总耐久)
+
+  * 弓 (customitem:item_5)
+
+自定义弓箭，无特殊效果
+
+  * 稿 (customitem:item_11)
+
+自定义弓箭，无特殊效果
+
+  * 胸甲 (customitem:item_6)
+
+自定义胸甲，无特殊效果
+
+  * 腿甲 (customitem:item_7)
+
+自定义护腿，无特殊效果
+
+  * 鞋甲 (customitem:item_8)
+
+自定义鞋子，无特殊效果
+
+  * 头甲 (customitem:item_9)
+
+自定义头盔，无特殊效果
+
+  * 盾甲 (customitem:item_10)
+
+自定义盾牌，无特殊效果
+
+
+### 开发流程
+
+#### 客户端Mod编写
+
+##### 目的
+```python
+    为了让Geyser能加载新增的自定义物品，我们需要编写客户端Mod
+```
+##### 流程
+
+  * 在behavior文件夹中新建**netease_item_beh** 目录，如下图所示
+
+![示例1](/dev/mcmanual/mc-dev/assets/img/customItem1.d637d44f.png)
+
+  * 在**netease_item_beh** 目录下新增11个物品Json，其中"java_identifier"字段用于标识自定义物品的原生Java换皮物品。样例如下：
+
+![示例2](/dev/mcmanual/mc-dev/assets/img/customItem2.1d5d8c3a.png)
+
+  * 在**resource** 文件夹中新建**netease_item_res** 、**texts** 、**textures** 目录，如下图所示
+
+![示例3](/dev/mcmanual/mc-dev/assets/img/customItem3.c44af993.png)
+
+这三个目录的作用分别如下：
+
+    * **netease_item_res** 用于存放自定义物品客户端贴图表现Json
+    * **texts** 用于存放自定义内容的中文命名
+    * **textures** 用于存放自定义内容的贴图文件
+  * 在**netease_item_res** 目录下新增三个物品Json，样例如下：
+
+样例中，我们通过**minecraft:icon** 这个**Component** 为物品设置贴图
+
+![示例4](/dev/mcmanual/mc-dev/assets/img/customItem4.e412c760.png)
+
+  * 在**texts** 目录下新增**zh_CN.lang** 文件，设置自定义物品的名称，样例如下：
+
+![示例5](/dev/mcmanual/mc-dev/assets/img/customItem5.81065eab.png)
+
+  * 在**textures** 目录下新增**item_texture.json** 文件，设置物品贴图对应的贴图路径，样例如下：
+
+![示例6](data:image/png;base64,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)
+
+![示例7](/dev/mcmanual/mc-dev/assets/img/customItem7.6f93ade8.png)
+
+  * 至此，客户端Mod中自定义物品完成
+
+
+#### Spigot插件编写
+
+##### 目的
+```python
+    为了让自定义物品能有不同的效果、功能，我们还需要编写Spigot插件，实现不同物品的不同效果逻辑
+```
+##### 流程
+
+  1. 安装SpigotMaster插件
+
+详见[下载内容](</dev/mcmanual/mc-dev/mcguide/27-手机网络游戏/课程10：使用Spigot开服/99-下载内容.html>)
+
+  2. 如App.java所示，实例ServerOriginalListener监听了Spigot原生事件
+
+通过下述接口实现
+[code] getServer().getPluginManager().registerEvents(new ServerOriginalListener(), this);
+```
+  3. 实例**ServerOriginalListener** 监听了Spigot原生的事件，**ServerOriginalListener** 监听方法如图： 示例中，**ServerOriginalListener** 一共监听了两个事件，如下:
+
+     * 玩家加入事件(PlayerJoinEvent), 效果为玩家加入游戏时，给玩家自动发放两个物品
+
+     * 玩家交互事件(PlayerInteractEvent)，效果为玩家和方块右键交互时，根据不同自定义物品，触发不同的效果
+
+![示例8](/dev/mcmanual/mc-dev/assets/img/customItem8.c3f312b8.png)
+
+  4. 创建物品
+
+
+  * 通过Spigot提供的Api，创建物品ItemStack
+[code] @Param material 物品material(自定义物品的material通过下一步获取)
+        @Param amount 物品数量
+        ItemStack customItem1 = new ItemStack(material, amount);
+```
+  * 在创建ItemStack时，自定义物品的Material必须与"java_identifier"字段一致
+
+  * 同时，通过下述接口，为物品设置基岩版中对应的Identifier **PS: 这一步为必须步骤，缺少这一步时，会导致客户端无法正常生成自定义物品**
+[code] @Param itemStack 通过Spigot接口生成的ItemStack
+        @Param itemIdentifier 自定义物品Identifier,需要和客户端Mod中定义一致
+        SpigotMaster.setCustomItemIdentifier(itemStack, itenIdentifier)
+```
+  * 根据需要，再进一步修改ItemStack的其他属性，如样例中的lore
+
+
+  5. 使用物品
+
+
+  * 通过事件参数获取ItemStack：
+[code] ItemStack item = event.getItem();
+```
+  * 通过接口获取物品的Identifier:
+[code] @Param itemStack 通过Spigot接口生成的ItemStack
+        @Return String itemIdentifier，非自定义物品返回null
+        SpigotMaster.getCustomItemIdentifier(itemStack)
+```
+根据获取到的Identifier实现不同的逻辑,如图所示
+
+![示例9](/dev/mcmanual/mc-dev/assets/img/customItem9.16f00d40.png)
+
+
+6.运行mvn clean install，会在插件target下生成插件.jar,把生成的jar放置于Spigot服的plugin文件夹下
+
+7.最终实现的效果如下：
+
+  * 玩家进入游戏即可获取两个自定义物品
+
+![示例10](/dev/mcmanual/mc-dev/assets/img/customItem10.52f3ff59.png)
+
+  * 使用剑时发生爆炸
+
+  * 使用斧时有打雷效果，并生成物品，其中物品必掉落铲
+
+  * 使用铲时有打雷效果，并掉落剩余所有自定义物品
+
+
+### Q&A
+
+  * **SpigotMaster插件** 简要API文档
+
+[SpigotMaster插件API文档](</dev/mcmanual/mc-dev/mcguide/27-手机网络游戏/课程10：使用Spigot开服/81-SpigotMasterAPI文档.html>)
+
+
+### **需要注意的是**
+
+  * 由于目前自定义物品为Java换皮物品，因此字段工具挖掘速度、挖掘等级需要和Java物品对应，不然会出现方块破坏速率不一致导致的卡方块现象。 `"netease:weapon":{ "type":"shovel", "level":0, "speed":2 }`
+
+
+具体对应关系如下：
+
+键 | 类型 | 默认值 | 解释  
+---|---|---|---  
+type | str |  | 武器/工具的类型,目前支持类型有：  
+sword：剑  
+shovel：铲  
+pickaxe：镐  
+hatchet：斧  
+hoe：锄头  
+level | int |  | level为0：当速度为2对应木板,否则对应金锭   
+level为1：对应石头  
+level为2：对应铁锭  
+level为3：对应钻石  
+level大于3：无法使用铁砧修复  
+speed | int | 0 | 对采集工具生效，表示挖掘方块时的基础速度  
+木头：2  
+石头：4  
+铁：6  
+钻石：8  
+金：12  
+  
+样例中，为木头工具换皮，因此为level：0, speed：2
+
+  * 同理，盔甲字段，需要和Java物品对应 `"netease:armor":{ "armor_slot":2 }` 盔甲槽位，详见[ ArmorSlotType ](<../../../../mcdocs/1-ModAPI/枚举值/ArmorSlotType.html>)
+
+
+入门
+
+60分钟

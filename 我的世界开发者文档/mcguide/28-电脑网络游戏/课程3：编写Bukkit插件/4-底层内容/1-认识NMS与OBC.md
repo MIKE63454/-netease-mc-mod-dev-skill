@@ -1,0 +1,142 @@
+# 认识 NMS 和 OBC
+
+nms，即 Java 包 `net.minecraft.server`，存放的是 Minecraft 服务端游戏逻辑代码，这篇教程将会采用 `Spigot` 作为 Bukkit API（就你们日常开发用的API） 体系的例子（CraftBukkit 也是 SpigotMC 维护，且基本所有 Bukkit 分支都是基于 Spigot 开发）
+
+BukkitAPI 真的涵盖了不少东西，但是 BukkitAPI 并不是十全十美的，有时候我们确实需要使用 NMS。  
+~~Forge其实也有个net.minecraft.server，但他和Spigot的没半点关系~~
+
+## 使用 NMS 之前
+
+md_5： _Wait!_ 你真的需要使用 NMS 吗？
+
+> NMS不是API。当你遇到什么想做的事情的时候，你不应该第一时间去考虑 NMS 或者 发包  
+>  令人费解的是，我们几乎每天都看到人们专门使用 NMS 做一些简单的事情，如 ScoreBoard、BossBar 或粒子。但是实际上，自从Mojang添加了这些东西之后，Spigot/Bukkit-API 早就有这些功能了。
+
+每当你考虑使用 NMS 时，请思考以下问题：
+
+  1. 我是否需要NMS来做这个？
+  2. 是否有一个API来实现这个功能？
+  3. 我可以为这个贡献/创建/ _**提议**_ 一个API吗？
+
+
+对NMS的滥用造成的后果非常严重。
+
+  *     1. 插件将失去版本迁移的能力（针对单个版本而言）
+  *     2. 阻碍了 API 的发展并且树立了一个坏榜样。
+
+
+如果你确实想清楚确实没有现有的 API 能帮到你，那么来...
+
+# 怎么使用 NMS
+
+NMS 里的内容太多，故本教程**不会** 教授NMS有什么东西，但是可以教你怎么玩。
+
+## 开发环境准备
+
+由于DMCA的原因，Bukkit不会直接提供NMS，您需要将构建好的服务端代码引入项目中
+
+如果没有且你正在使用 `Gradle` , `Maven` 这样的依赖管理器，考虑如下方法(图文):
+
+这边以Gradle为例
+
+  1. 在项目根目录创建libs文件夹用于放第三方库 ![](data:image/png;base64,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)
+  2. 将构建好的服务端直接拖入libs文件夹中 ![](data:image/png;base64,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)
+  3. 配置Gradle ![](/dev/mcmanual/mc-dev/assets/img/0_14.2a86fd89.png)
+  4. 同步Gradle配置 ![](/dev/mcmanual/mc-dev/assets/img/0_15.5c024f55.png)
+  5. 你已经成功引入NMS
+
+
+## 获取到一个来自 API 背后的对象
+
+_当你从控制台直接输出一个`Player` 对象时，会发生什么？_
+
+你会得到一个 `CraftPlayer{name=玩家名}`而不是NMS里面的`EntityPlayer`。这是因为在Bukkit-API背后还有一层，他叫`OBC`，也就是`org.bukkit.craftbukkit`。
+
+OBC 是 Bukkit API 的实现，其本质是NMS的封装，因此我们并不需要太关心它。
+
+最简单的一个说法就是，实际上我们操作NMS封装API也是OBC所做的事情。
+
+就上文问题，怎么拿到一个 NMS 里面的 `EntityPlayer`?
+
+首先我们需要使用反编译工具，当然了，你也可以通过IDEA直接查看。
+
+来看 `CraftPlayer` 对 `EntityPlayer` 做了什么..
+
+![](/dev/mcmanual/mc-dev/assets/img/0_16.e71bbe41.png) CraftPlayer 将 EntityPlayer 传给了他的父类构造器，我们接着追踪..  
+![](/dev/mcmanual/mc-dev/assets/img/0_17.34111cf7.png) 而 CraftPlayer 的父类 CraftHumanEntity 依然将 EntityPlayer 传入父类 CraftLivingEntity，我们继续翻阅到 CraftLivingEntity 中 ![](/dev/mcmanual/mc-dev/assets/img/0_18.2ed14820.png) 经过一条不 是 很 长的继承链后，我们找到了 `CraftEntity`，看来 `EntityPlayer` 最后是被传道这里了！
+
+> 注意：OBC里面的类 `implements` 的都是BukkitAPI的实现，不要搞混了!
+
+然后往上翻，看看 entity 是什么情况。  
+![](/dev/mcmanual/mc-dev/assets/img/0_19.fafa4d2a.png) 他的修饰符是 `protected`，这意味着只有继承树内或者同一个包里面才能访问到它，而这在NMS/OBC中是常有的事情。
+
+## 反射！
+
+我们很容易就可以写出这样的代码来获取到这个 entity 对象。
+
+而这就需要用到Java的特性 —— 反射
+```python
+    public static final String serverVersion = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
+    try{
+      Player player = ....; // Who cares ?
+      Class<?> clazz = Class.forName("org.bukkit.craftbukkit."+serverVersion+".entity.CraftEntity");
+      Field f = clazz.getDeclaredField("entity");
+      f.setAccessible(true);
+      Object result = f.get(player);
+    }catch(Throwable t){
+      t.printStackTrace();
+    }
+```
+现在 `result` 里面存的就是我们需要的 EntityPlayer，然后我们可以转换它...做点事情。  
+为什么要这么麻烦？其实下面的代码一样可以做到这个效果：
+```python
+    try{
+      Player player = ....; // Who cares ?
+      Field f = CraftEntity.class.getDeclaredField("entity");
+      f.setAccessible(true);
+      Object result = f.get(player);
+    }catch(Throwable t){
+      t.printStackTrace();
+    }
+```
+假设BukkitAPI没有封装修改经验值的方法，我们要修改玩家实体的经验值
+
+就可以通过刚刚获取到的result的变量判断是否为 NMS 的 EntityPlayer 对象
+```python
+    try{
+        Player player = event.getPlayer();
+        getLogger().info("test");
+        Class<?> clazz = Class.forName("org.bukkit.craftbukkit."+serverVersion+".entity.CraftEntity");
+        Field f = clazz.getDeclaredField("entity");
+        f.setAccessible(true);
+        Object result = f.get(player);
+        if (result instanceof EntityPlayer){
+            ((EntityPlayer) result).d(1000);
+        }
+    }catch(Throwable t){
+        t.printStackTrace();
+    }
+```
+> 那为什么result的方法是 `d`？ 这是因为 Minecraft源码本身就是混淆的，OBC则是Bukkit反编译探索出来这个大概是什么方法然后进行封装的 所以我们在和OBC做同样的事情时，也要大概去猜测这些方法名是做什么的 大家可以尝试翻阅一下 EntityPlayer 源码，其中成员变量 newExp 被 方法 d() 所修改 所以大概猜测这个就是修改经验值的方法，调用后证实确实是这个方法
+
+## 版本兼容性
+
+实际上，如果你直接采用了 `CraftEntity.class` 的方法都会对这个 class 建立符号引用。  
+每个版本的 Spigot，无论是 OBC 或者 NMS，他们的包名都会变化——也就是说你的插件会爆炸  
+所以，如果你不想为了一个版本再把逻辑写一次，最好还是用反射的写法。对于公开的方法，也可以使用更高效的 `MethodHandle`。
+
+如果你有注意到的话， md_5 说过 `NMS 并不是`一个API(其实也包括OBC)。  
+什么意思呢？也就是`使用NMS没有任何安全性保障`，**你反射的字段/方法或许下一个版本就会被删改。**  
+实例惨案： Minecraft 1.17 Spigot大改，使用 Mojang 官方混淆表，以往 NMS 插件**全都** 报废。（除了一些自带兼容的服务端）
+
+# 本章小结
+
+  * NMS是`net.minecraft.server`，一个包名，放MC逻辑
+  * Spigot的NMS没有安全保障，md_5 都不推荐用
+  * 使用NMS之前要先找是否已经有了对应的 API
+  * 在 Bukkit-API 和 NMS 之间还有一个实现，它叫 OBC。
+
+
+高级
+
+20分钟

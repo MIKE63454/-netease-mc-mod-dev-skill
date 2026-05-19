@@ -1,0 +1,232 @@
+# 使用Python编写界面逻辑
+
+在上一章，我们已经使用逻辑编辑器，制作了一个简单的弹出界面，用来发送title消息。
+
+本节将会继续使用上次所制作的界面json文件，使用Python零件开发来重新实现一次功能。
+
+在开始编写之前，我们需要找到上一章使用逻辑编辑器制作界面逻辑的时候，所编辑的项目，然后选择导出资源，找到资源包，ui文件夹中，当时所编辑的文件。
+
+![](data:image/png;base64,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)
+
+导出并保存到一个能找得到的位置，再新建一个空白附加包，将刚刚导入的界面文件导入。
+
+导入完成之后，可以自行修改命名空间。继续新建一个界面预设，给它命名为`TitleScreen`。创建完成后，勾选预加载，切换到PushScreen方式打开界面。
+
+![](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAArwAAAIcCAMAAAAjeI2fAAABelBMVEUeHyA0NTazs7M4ODg4OTpBQkNjriEsLS4SExQ3iP8SEzRpm7ODUBRPExQSE1AzExSzm2oSUIP///8SNGqDs7OcazdpNBSzs4Obs4MfV4YzaptRhbSzg1CzhleEs4SDs5s7HyBvPSFrnJwfPW8dID07bp2bsrQeH1aGViBLISKcnG0gHU0ec7yzspzY19eznXC8cyCbs5uchlZTm99VHyAhTpf/4ZXdmE1ThZOW3/8eH3QnKClrn4N1vPqYTCBvnbOHnXC///+Og4Q4QW6FTU8gIiT/vHQ0e+UWGBkqL13R45pQUVJkaICW3d9Ncp5nh7RzHyApM0mVmZy7+8yzs4c1gvIwcM3gxGx4dmuGWTJfdC44UIWFjf7f/f9dLS6ddEeec1b7/72NriGd3783p//8/98/QEFeoyIwZ7dpPkPEh0P/3/9BIV9CYqReiP9jrk7KyCVjyrxXHVg2GDjBs/v/xYdlTxWTnIUaKRripGkzNBS3mIINEg3/vI3dSJv0AAAhvUlEQVR42uycXW8aRxSGhwW0cFchRyqi2xjjLwgxFOoQmyzYJgshOGBSQ2rlg0ZNLqK6vUgjxVXz43vOzHgxAZpEOLEH3kd497AzIEV6dPLOLCDOzs4iAJhFudZxXVd8+BB54JVtAAyi7HndZ644i0BdYB5lEXFF5AHcBUZSEw88GwAD8boigsYLDA0OImIDYCQRyAsgLwCQFwDICxZV3rZjj9DcS9sAfGsCrRaf6DjGdHmbP76Qp6WTjmXl2hYzsJlu9cRWxAd80JYPC57MHL+wAZiN1tZWWB5bny1vW8p3qAVsD2TnZVeZ5s2kKu4m6TF09uS80JLfg7xgdnnJWzp8vrwsHjmovYznTpcsyb9VyyeXrmXSrLTDPusJbDs6L7hEwluS8NjA9NhQy9QKHAR0gNCd1++vqnTsuCUZqDl6st95Dx0bgBlpKXc/X17VYQ9kh306knnJaRkYuNs63ZUkGa6cbcsZWl4JFwDM3nqfTwgNU+VVnZa9ZEu5ln8M+2pTYCA1Dwpssi/vgC5JeWvryA3gkihz450YeT+1YJPytk9qhY6OubYUV63YDlndSfJqOic2ADPC7oa/bMFW+/7t+/fkI8lLtrZPLu7zxq3bSTWpELcUudNhbHhzcVFnAzALeqss/CXyriSbe6d7K0kZGzrHb/Vmglqs8ZlJjXVeWZDVA3RecDkEWmH7y29S7PFWmJLXyvmZl544fGA9R2MD17podXJpyAsuhcC0gen7vFXLYftY3s7A37n9rmppI9sk9Li8tXX2XFVYroGvDMs7HfYegGsJPlUGIC8AkBcAyAsgLwCQFwDICwDkBXMgbwAAI2F5BQAGAnkB5AUA8gIAeQHkBQDyAgB5Z8CzA4FgMBCwPWE03e1+o9dr9Le7kHdBKAdCPoGyMJZUI+rTSEHeBcBT6voEPEO7bj86Qr8LeeedcjD0EUEjm2+zF/2IXhPyLpi7TNlAd6MTaELeecYjd8cJesZlhl50Ar1VyDvHBEITMe6f3o9OpA9555dyiDE/OKSiU0hB3jlvvOa33kZ0Cg3IO694oal4RiXe6FS6kHdOsUNDaku/hS5gC4PYjvq8isViz6JDtiHv3KeGcPX48Yi8AUOXa/t/kb8X7O1D3kWIvJ1ReQ2OvPsX5G1A3jklOF3eoDCIkU3e0c7bg7yQ1xx5Xz1/F4W8iA0mxgY39mzR98ogr6ELtp0/cI9twbbKmI75W2WcGbjvYqtswW5SsLzm36R4FWPe4SYFbg/j9jDkxQdz8MEcyIuPROIjkZAXH0aHvHMaHIL4GhDkxRcw8QVMyIuvvn+Ss/Gvvq/iq+/40ZH/J3RpXPaPjniQFz/3hJ97grwAQF4AIC+AvABAXgAgL4C8AgDICwDkBQDyAsgLAOT9yqR+SopUYfXez1RzUbWYY/l0tbopFPEbfHDknMyy2Nhb5hOfxdVw61GFT9sP03x84l9YOhK3dmKx2Et51txJZ8/LvGBojAsmW+JDXWjc1xVd7f5SgbzXnY2byYTF3GaLBWnMmvpjqribpMe5vH9XLUlumSVel7UjvinFmA/J5+bd/NBmqsg8kvf3I3pQtcuGU8mGj6npVuhxLu/ufml3P69L/faQ9zrDqqrOyxJvkrDx3LLuwFrSVIY9ZXnl9U3VeWV9kFm+4s7LB/cHbrPcNROV7J00uTnaeYW8InhIX9YD9FpyW8pLIy+PWGc+FlWPpmHIe32pWpwI/NhAhzUdGtY2/cCw5oi4xdDktdyyrHkWGZy6Inm1gtLGf3Zir+8/qiihs+QeD9MIUcwLv6mSl/TnX8yWuKyLrG6x7uv7O/ItT/frxTtptyJlR2y4vrCdCUvhcOZlmTeWqKYnOjDQc2d1JanDRMJyfHnJ89q6ihxX13mL9F+7jA30cGP1SdGiTjO3HqbZ+JLOyBwYWOk6vYoz7xiUH9w6Mu91l5ebrFp6pdbJSG65DPvKvZUuHBTIZCVv6nGmfaCb9cbjzNODDE2j+uo671JHy0uxlrxUIywpZ12CBuWarJjXzvNRJ4Li1hMyWcvrcvAo6pghkwMWbAbIm9iUkbZqOdRMJZtCiqtWbIc1UlfLm/g148eGtfucfZ/eoJGrzLxZJe86SUfy8oN3E4ZrLilhsUSpl1OCfplasa38SZN9efPUjYt5HmWTsWAzQt643DegIlXQYVcP6ThA1+OWIndYkyH3rpT6lJXfuPmGmu+3ZWTRpeTVNj/J5oslDrejnZeGScrEeYbN8uJOz/ff54K8bmyrpCZC3uvM2n/snO1PWlcYwA9XEi7WV4S+oesbWBnY0LELVYabqaJzbWpnjM0Wk5mlyZa4L8uyT9v/vuc5HC4YuHVkaT1kv18oz3m5rf3w8+lzjuUpyBFMbhFE1GFJ1VCZbDh5zdA972V+6KqsLMqvb9zEke1PY74zSiyv2Bqdd42tgs3VzNvoxrcJSs0uuvL3atmwtpvTWQN5/efe5kC9QeZ1JzN9K4zI+1CWf3qndj/95uXdL5+sv/vk9mrNq5aKbU5e56CMJauu6+Zw5o1EW6lht3edpRI67uw2WjZYGpQN3rP/4lF8pbumpjp5ZdEJWZYMe1XeHzUhyw8n1kTeN3t5m7c/cdHbEWmdxFbY6DwnyKJLr2Lw38OlRacenbdMfz32s1kZyOuw8pJ5/x/sG0BeAOQFQF5AXgDP5Z0B8AwyL1A2ACAvAPIC8gIgLwDyAiAvIC8A8gJ8FHkT2yMpxc1HZtCDBsAreRPbI+lqvvA0v+GG/d4dAN7Im9AeSdOxbUBT1PdyYB2WbQPgibzJ7ZGKm79+bY2+zK/Jx3QlJcsnzXEXfJJ3fHukEaR+KLpliQAeyJvYHskUtZNX2bVC6FUOyAteyZvUHskUNyQblzd0V03mwAaeyZvcHunhkLzF4PtC70HkBZ/kTWiP5MqGvXygs3JfXsoG8EXe5PZIcdlgKQc9kBc8kjehPZIjlpeyAfi/DQDIC8gLgLwAyAuAvIC8AMgLgLyAvI52Kg3gBanMZPKmMochgBcctmcmkbedCQG8od2eQN4UeRc84jA1gbzpEMAj0sgLyAuAvAAfX96V57c1LHw2HwJMibzFQFkdlXchHwRzIYC/8g6Enb01F4/V3blw9ivyMEyhvCufL4YA0yDvyt3fpUxYqspY64WCzbyKnc3e2ssvLfY2+vsPXmkA8EDeeZd5Fx7cDnW4HNyZV1MLNinL2G30Q37VnvIA/JF3OVBU2fvBari8tOgqitBtuGAdfoy84JW8qqtFS4dheXUYB+QF/+S1xe6L+ZUvrKA6W/jByus2XEBe8Eje8H7vwLayrhe8MtOgszvW67C34QKZF/jxMADyAvICIC/ABKT5GBBMIRN/DCjTDgG8YT8zgbxmpk3uBU843E/TdASmk1SGdk9ArzIA5AVAXkBeAOQFQF4A5AXkBUBeAOQF5AVAXoCblzeVjsFumCp5UyaM2Z/c3u2jigG4GXnT4RBpM6DRMmbMtNNUW6s/H3dyuWYjp7TMf6Omf2RMdaveX2/pW9eAMcj77+Vt5BwtkUlCs9JoOdFkUOuKvOqzzbw1Dbu5XN0kEnv5fmdE1pH59smOsXR25IW8cK28f317UBqStx4nP0t0bk1WV6uvd6y84tylKKvIoK7J+Hp5g2YlUV7dz8U0K9FRRb4c8sK18pay2dLYzBuXDfLaPhFBo4s3Kq8du8wrnhnhenlXt1rJ8g6+a2otHXZNrf+XAOQdK2+ppP0fT7NPwnGZ1wlUt/J2/tDxs0DlrQ3VvNu79nmJMqture02K3boVqQSWJeg5Wx0XldZ7frFcW8/5+bqaHTmCgZZ6UqSp+aFD8l7kF0OD0+z98Lx8rpJpy7yylCnruaVrGt/CTVnYsvmVxlL4aquuiAimuj9joxM4+JY5LVP1i6O1Xo9A7rnjFFfe4m88ewsOuPABh+U9202+8tBNko6sJnq88uTY5XKydvpyduoR2cdV57a39F1//6rhC5ft1ywbr5WeWW3K4/Jyz5oo87dF7Pi9k5sj387M9w2wDU1b+lU9A3DpMxbq8tUnNLFxuqW5Fgrb3Qk88E9r5YOw/LqMA4DefXsFzh5ZSWWV6Oi2uuVhK0gVGmlyV3yP+yc7UtbSRSHb2YFLxqjkjvW5JoaG/OCbAwrFmVTScmuRVDsEqTULQvuh/1Q6Kcu7JftH7/zOzmZMEUTQth4ld+DyZ3My50pPj1zHGMo7wPyfrv48CF+UF450n13djLMHHRnR9pw9udXPW1wMVgERRLw85EoimKU/KaXsbwSo0dpA66IxbhKP5lydOj2mpGXzHfOi1Myl7Mi+EFeDbYir5NQXmh/iaouLkNRFFGjl0BeyKo/sImqfzXca+3ubvoOTyeUl0yXN3ce/Hr4/nNeEQ+y/ShCv/7DeXt24hWf6td5NB3RWgTW6Ex5Cd+YQ/iWSEIoLyGUl1BeQigvIZSXEMpLKC8hlJcQyksoLyGUlxDKSwjlJZSXkKcjb/NtNSLkacibdmDr/pvj1JjOtQE22u8ZpVOt3aJb7UCkLml1e29cvjmOUuOpRIQsRt5S59pGpYqTN4rqViJvyWqTXtMWnusVqRu6uf9qbxyrXx77KyELkxeuOhFFXufxl2QUblVe7XM9iqqBvLWGRl7KSxYurwpX276CvCjfG3lHWUOQNjDykkeW93RgHIM+5C2Nc15JeZV/e8Yi0uIRpA2pUTRSN3cbanvKvJcsIG2ot/CQtEGirjyUktU+Ft1qjVaQ84Z9RN7PvU6V8pJFypsO5a23akepD6SBvM0E8dgZG6QN9RvkyVURWtOGuqsnZEHy3vbMzbHIWzu4bkUPRF5Y2dwN0wbo+r5vbArXff58wGNissDICxORNqQ3XxMjtEJ5764SG5VwqBDKW2vY0l0inVVe5rxksfIi2Iq8pnN/zmuQ8VaaiQ1OG/Z7SBvsvkt0KS9ZuLwqo601nLepjer+PNepqQEYOXEzEUFTG5w2tKIUfSA2j8oI35hDCOUllJcQyksI5SWUlxDKSwjlJYTyEspLCOUlhPISykvI85C3m1siJBPklmeTN7d8EROSCS66P8wib3c5JiQzdLszyJtj3CUZ4iI3g7xLMSEZYonyEspLCOUl5DHk3dxYjzfNkPZW7Msv1uLJFH/aiv83sCqyGLIv78pqW1wrJIEWKu/OsM+rsY6Fl4G8GGhMPlYekhezzKDexFWlsqjyxicDdlZW85h0ey1Yj3QqY7CvdXckz03egRUZzBR5i417Ii+syMcrb3xdCMTSQh+3V3m1ZQKTVrWJFeh4V/byBuvB/6DC7tb4fjbGOJIVBofCAOU55P24vQY/r0JNwrTh4chbPJBhU+W9XbUzyDtpVdBTZUUxlBfr8bbqWG1GR5IVzg+B6aI8h7z5VLT6tLHuZJDIKlcTRt7UKNKQosFHOoAhdmX112Tjl+01XI3Jow4CySzFRl50ko7DFikipkviUZa5pW7yqjB5WXOH9bG8ZckiZD1i+d9o0DHyD3F3JFnh2yXkvZTyPPIO916JaVZ2YhEgDeUVNvXb7+VFnYpl5Wau7DzC1W/pAIXyizXMsbuFV6gYFT+uo6/GUq2btCqZIK/Zteut2YzfLVBE7HYxeDSmTHkzx8AnDfPI67ZYpJLyJRW4fp82wD2fB4eUzQ5a1FHvlioKUHaPHcxhgEWFFiXmwk3MonWTVoUyTHdX2OgjrzzpeiAyovlwDCNvFokOD8/nlhe7+XsbqyYIs16TIPIWhh/Ki7YQxLfp8iI96OscOi2KqLaxytjG1NNWhZxBImlZQ6zKi6jt16PJObrrPZjzZo3LSy3MJW8hcRr4DRpXxMlQXpFs8w5aBGlD8Uj2egwp/D6WF2lpmDbo2YGIdSotWnQTom/xH/TSukmrQrow2FJFx/LKGL8elXc0xrXxiDiDzC8vQhn08D8aYfNuX4VpwzCNtTAhkBd7vpGw6kaO5e3LjURXP4topD+eSYsUJWntu8CZGmz3Ujd5Vapw+t05byovdT0qr46RWXlS9ozknU5w2pCPU7UUlRPJ1A7N38plngy9t4HykuchL/Z8x6O5THmnQXkJmVNe/hkQeYrM+mdAy92YkMxwvjyDvNFSl7GXZISL8yV+6Ah5muSW+XFPhJ9VRgjlJYTyEspLCOUlhPISQnkJ5SWE8hJCeQnlJYTyEpIFefd7LS2VLJ4qkZK297TU3N2LCMmWvKGap3vuayRvM7HNpKVFI9iIkMzI2zOeTrV2UG2+rUJehOObYwRfPNeNOOyaI0IyFHnrLZ8w1CtRyQg2bX/uidFfkkq9Uz3dc106dJdkS97af+ycz0/bSBTHozkNgfxSYqhxDCROwKJCiIhIHCpRFRA9RKwWoardXnpspZ7ooYf953e+zy9jTZWki7plDfp+RGOP5/nZKJ88P5vCpGgY0Byko+FAet4QTOWJbnZLQqohr/NVO4Lxm4kzWeVNjDkajKWbwBCdA+UlFZMX4hZ3bLMLp66XN3fVeJxjFibzho1UTl4QuxqrHUTsb96SUt7E3EZFIOUllZPX5L79DduGy57BaDyXl20DqZK8iUnxEnl5w7ZBGJsCyksq9ZzX+3m8V8qreHnZNhD+3wZCKC+hvIRQXkIoLyGUl1BeQigvIZSXUF4lu14jpBK8mz5M3uvPV5aQSvDndO0h8mafLSGVYZr9e3mvrll3SYW4un5A5V2zhFSINcpLKC8hlJeQ3y9v92QTi+ZOwxLyRORNDOiH8spqz5gNS0h15S2Fra9vYN27u2Hrr1iHyROUt3vYsoQ8BXm7L+57xrRfunX0C5FUXiCj+vplr90qJubzuzMsCKmAvA2tvM3dTYvVjtlqwNRIirJb14n5oteXuzxCqiNvxwAou236ttNuaUdhdUIX4vCQ8pJKyQtd/U1bKW/hsV9QXlI9eaXZPWt0JyIoRs2/RF6d0AXlJRWS124XN2zdfTzgdSMsMNoSr20xoQtWXsIfDxNCeQnlJYTyEvKb5H03soRUhtG7B/wO23RqCakM2XS1vCFrU/4KJqkIo2yNf3SEPPc/OqJc1Qjh3yojhPISQnkJ5SWE8hJCeQnlJYTyEkJ5CXk+8h683qsRyrtkbnSe61oc4SWFMj1jjveywz0V6MaA48CjxID2uTFHA8kzHKzKqQFjTAhjzIBwmMhRRq9OE3fA4rhRjVDexRzsqnVnA/cF0VDvDl5/c16au1ORToSGd0p24rYll1IWsZPxRMtySp4iMK+NfbgTXT4XKm98fBM52Z288FnOBP4nFJjy/sC5UbTQQhUv782Rky2VKiruqj8y2DkVD8XVqzOI6vaWsjpamBPqfhkOxqn4iUhfmIVsX5LhwM5xkdfFfe3N80B8QnlDYJE6NE4hJIjQNvz9/b5nxDOYlO0fDcJrfJyefXl9ExXVFTuAdEXO3dtZ5MbSF5SVt0zpvvChqGUvZpBX1mHzvPMglDckm+jF3fmXor5p5f0YoRyia4BXo/O7UzdfU+SiHreHTt5P6Hm/nN/NiskYui/OibYBdVnMLiuvyp2LvGe3WL99A3njoOeFyoTyBsAoXPKdT28msC5WC131Pd6DfWhDUXX9lMbHBpf1T85jaBpr5V2RMzuZufIN8wN5dZDkUnxzDKVtkKqLf/p5obyUN0QkK+6uZhcomL7ymuOPRbuJYpoYIArrPho4hry628qc0O925nvhsm1wE++/7pxCeJU3KeQd59kk8U852PRS3gXEcymzSTyX6yvahjiV4nd2cejlCSsvgLx4lOZJl+W8+TAcjIYLKm+cu6He740/nLtWReTNDm/yGisvWS2vyQvRgsrr5YWqgbzagPrKqx1CiuZ4WU7U128w1wkcyls80k2TCCVXts8NT+7ue0bI+cMKyrsA5w1eoh/l/cPczaRgLpAXmvnKi/sx8VY2pMtzagqtvEaJcFuYo7/28sJTkRcHF2n5tIHyghDc+wtjPJMtRUuwvay86H7VZCCbtfJG0DBXcTEeLcmp8h7g8VtQeXVqhH5B8pgo20efHXnFU7a8lPe/I3aiPR78CRvlJYTyEkJ5CaG8hPISQnkJ+f3yvrWEVIa3D5HXElIllsnLukuerLwsvITyEkJ5CaG8hPISQnkJobyE8lJe8vzlra9vWKA0dzftj3RPsG01YbKFKR4NPVhzp2GJ51nJC08fR95Ou+VS1NePCqd67ZYPN8ZsQbFtt9J3Yx/yUs5DApByJf60EwP6obxFQqQhz6jybkcr5H04q+SVudvIiqcYluEdaJVgKggpTm64aaHiz4+HcBVWJ/w63N2w9VcY/SJIzA9BJeTtHrYeVd73LxrwcRbKa7tuc4KVIAQnB3lF7J8fD+FL5NXJX4fyVkdevBF4uZRrqlxaIyfvDBdw2913G+vrzpvt9oUzCrNbDYmGe34/jdTdXUY37tsgAPI6Qd1cEmHwUYa22CSB7kCavQyROZW3OCqOgPORUBngpd2SDQhXeV3me0y83NEwqbwAozCZ/6ZlVJ706iNa8v/KCzp9vF3ujelsNVzJhTzNXt+iQX3fwsaOSOQ0a/Yiiw0SDfx+GikBSNA52gwDbCmvG+E1kNcXs20cqwyRk9O2QVLpCWJXOx9g12IDwlVezYx1DbMd6azn51gmC79pW5700iP+w84Z7LhtBEEU0ElIsslhLW0g7Tk3HexTzvqBAL45+QwDCeCvD6un1MMRsQThkWAt+AqGNSJnOEXyLbdJl8mV90Hg1ekt6IiXjbTTORIyutwE0cOpG/6Ipubc5Tj3vJQGZ8NdO1R4dSUf2hN4NV3QMe5ic5vNae+t2OCH0z6/aEVZoO5TeN0tyujXLF/qxq53Ok2/OSPwPgq8KicT3vLb0Ofx+Y9dqUV3h2horZZP4S09E96Tb68aul/N04DPX7vtNbx15nGXMGeutdzdyiR7fSkrvEDdp/DmmLhps8fcWH5M4X1jRmrex4FXdzI//fw64PXyFHXhn0/lPOpUaeH2+b/P+22WDa5EQx4XfHj4r38HzL+0HYbGLnn68PLkJ2daVRDRpfXbAJ+2XruEuTG8Nvj8r776i1aUBdF9Au9lzKcAND3mxtqdVoFi02/OCLwPAq+vpee4H/GNl8+jfl+ff38qBD6Pb9gSXo9zTw1/SUDHHY6bsonLRXgbuMcgjd2UgiQ+my5ho8Kbd4bHekNZHqrFguhe4dUK3bBlN32kx9yYPyq8Nj03IzdsDwKvSPkuGaiuDlN1mVP3TlEVvCN4O/4J9S7wdphz9x4B7wqCOUMFMeiLT/Nsh3cl4F0iUmUIAS8CXoSAFyHC6NbyDfXLj5fvZNML0WrC6E6Rz3vxsOXotU5ao8fXbYSE/im59hraDNlPdDpocC497X3k0mbrHXhXFkafS5F7tBtnbdLwes2MWiet0YjBefzQbuBNP6IwD5S679Q3HFuz3nkkt4Iw+lyKvIX3y4DPcnhbJ61RIWdY1WzgtR/TmmO1Wh0bszPegXcVYfRpilxevOGaC3ccSDiNEuPRtL0mUN5M4x2LKTQqSoKDa4ffKryHqCKKHw39qhUeoyhxRObNfUmRznkn076CMPo0Ra5R3rDHxQacbxslxt20vetAeU7jHRNqEWxLWzoKrspdl4cpNePaPVxXL2MOBd5wXOGd8044bQVh9EmK3KMaL2or/qZxNTHupu01gfKcxjNlnFl/lR/WUhqMChv9lX5cqJcxeeUNxxXeN73zHzLWEUaXnCKfh1flwbmg6AVu2t51oDynuezYBUS5HfxGqLeB1zcDLmXEacJr5sNxhdd9gXetYfQmRZ4AeMNjeP3sYJQYd9P2xoHyxsllx8rdWUz78fPeiFZ4PZn9GF6PCdt27D0TvDPeKRvWEEZvU+QGIB37UZdNCaNxYrw0ba8JlDfTeMdUUpz09MEIH6+e8x7jq/0Y3hwT9rZ2rPkE75x3Mu1rDaM/1FVLPwCLDyePyFYfRn9ceOcPJ/ASRk8AcqYfysPyPATwkipDwIsQ8CIEvAh4CaN/p35YGP1BXuZOGJ0wetqc9c7L3AmjS+80jN7xMvf7iDA6YfSiBd47XuZ+FxFGJ4y+OIz+9ZYvc9e56izaCaMTRl8aRr/1y9xl79hTJRNGJ4y+NIx+y5e5m+q+hxWE0QmjLw6j3/Bl7r4BHIx3iDA6YfTFYfTbvszd56pDhNEJoy8Po9/2Ze6lZO8QYfQiwugLDspNX+buIrBHhNGLCKMvOSi3fJm7K/MeEUYnjL7A+10Ox7H3OJAqQwh4EfACLwJehIAXIeBFwIsQ8CIEvAh4gRcBL0LAixDwIuBFCHgRAl4EvMCLgBch4EUIeBHwIgS8CAEvAl7gRcCLEPAiBLwIeBECXoSAFwEv8CLgRQh4EQJeBLzAi4AXIeBFaxfwIuBFCHgRAl4EvMCLgBch4EUIeBHwIvQ/u/bT0jgUhWEcoTex2wOFAZnpN3ATCATsIqNQKWQhRQqtXbT2nylqC3Yh8+XnnmQIDnZmMXMvRPP8tKV2/XB4LSVegHhBvMQL4gWIFyBeEC9AvADxgniJF8QLEC9AvCBegHgB4gXxEi+IFyBegHhBvADxAsQL4iVeEC9AvADxgngB4gWIF8RLvCBegHgB4gXxngLECxAviJd4QbwA8QLEC+JV16fAh4iX04uPGy+3F/V2/cd4gbojXhAvQLwA8YJ4AeIFiBcgXhAvUKd4Q+BDIl4QL0C8APGCeAHiBYgXIF4QLxy42fTbzvU3N+FRJ+N14Nx6fBK+1VoZ51Yt4q2dm9u2F7dH6z1ZB16s39ZrPCHeutm0PdmER4wDT8ZhpWU8aRFvzfTbnvTDI9aBJ+uwsjKerIi3ZtrehEcE3oQV4w3xEi/xgniJ9x3iJV7iJd7fES8aFu/FYE68+Kd407v2UYvpk6d4k1hrfR7OE5E4EzVyGm9PrGXHqLPZ1dmruby/MlFOvI2IN3nxF+8+zkb2ycYbBPaVXt6923gvs46JfqRlwZNhJ8ptvI+DB+JtTrwisn1yHa+2+jzclfHu42+pFOK563jzKC9eWDZd/WE2cHn/L94LPbjd2b3Gq6+9XN5ERHK7FiaDh97rr3zZvJ8xXnl3YROpbF3Hm52LtTzXePc+Nm91eR9Hxv6a6PA4lQKb95Ne3irYquTF1s+nDdlOH+Vs0KtbPJTjy6s7Nyp6Ldcu/7A1ZDbouxqvPnzEm5TxZrvuKKkmr+vLa6KvOhaiVy5vo+JdTF803ETufMSbymxexNsdaMkeLm/2PRU5TFLdu72cy9uceLVdfa8nW1+z4Xm4C3Q2JLMvqRR27uLV1TDTxXAmB2Mmwysub8NmQ1JMX0/x6rEt45XYx+ZVUR7FD9FBBy+X93PF+/dPFXrV3x7i3Ys16k5tt8koyKQUO49XDvp8KPs19vouO8TLdxv4Yg6Il3hBvMT7s507JgIYiGEgKFcOpyfwSMIfQvow0Mwuhmsl8YpXvOIVL6bvpu9/Tkecjjgdcff003339Lp7crTnaA9cnIJ4ES8UxHsXKt1koVJyFiqdzEKlES+1MjvJfaDIzZmZD0r3UFcMlv/FAAAAAElFTkSuQmCC)
+
+到这里的操作和之前使用逻辑编辑器是完全一致的。
+
+接下来我们就可以打开PyCharm，打开这个项目的文件夹，进行代码编辑，第一次打开需要设置`Sources Root`，这里不再截图展示。
+
+![](/dev/mcmanual/mc-dev/assets/img/25.3baebdd7.png)
+
+找到`脚本文件夹/uiScript/TitleScreen.py`，就是我们的ui逻辑文件。
+
+默认第二行的代码是
+```python
+    import client.extraClientApi as clientApi
+```
+我们这里可以将其修改为
+```python
+    import mod.client.extraClientApi as clientApi
+```
+这样就可以正常的使用补全功能，解决自动提示的报错。
+
+观察这个类，我们可以看到其实和逻辑编辑器中的蓝图零件，可以重写的函数基本一致，同样拥有4个函数。其中`OnActivate`和`OnDeactive`是只有PushScreen方式创建的界面才会被调用的函数。
+
+使用Python代码创建的UI，有两种逻辑编写的方式。一种是像逻辑编辑器一样，在初始化时为按钮添加回调函数的绑定。还有一种是，使用数据绑定，在Json文件中提前定义好需要调用的Python文件，和代码中的函数和变量进行绑定。
+
+## 方法一
+
+我们首先先介绍第一种方法
+
+那么现在我们就可以在`__init__`函数中，在初始化时将一些常量定义好。比如我们需要使用到的ui控件的路径。
+```python
+        def __init__(self, namespace, name, param):
+            ScreenNode.__init__(self, namespace, name, param)
+            self.mMainPanel = "/main_panel"
+            self.mTitleText = self.mMainPanel + "/title_text"
+            self.mConfirmButton = self.mMainPanel + "/confirm_button"
+```
+这样就定义好了所有我们可能要用到的控件的路径，方便后面的调用。
+
+接下来重写`Create`函数，为按钮添加回调函数。
+```python
+        def Create(self):
+            """
+            @description UI创建成功时调用
+            """
+            buttonControl = self.GetBaseUIControl(self.mConfirmButton).asButton()
+            buttonControl.AddTouchEventParams({"isSwallow": True})
+            buttonControl.SetButtonTouchUpCallback(self.OnConfirmButtonClick)
+    
+        def OnConfirmButtonClick(self, args):
+            pass
+```
+这样我们的在按钮点击后，就会触发`OnConfirmButtonClick`函数
+
+接下来我们回到预设编辑器，新建一个空零件，命名为`UILogic`，并将其挂接到`TitleScreen`这个界面预设下。
+
+我们在这个零件中，监听客户端发送过来的发送Title事件。首先需要给我们的这个零件改个好记的名字，这里叫做`界面服务端监听`，因为我们等会儿还需要在界面逻辑文件中，通过名字获取这个零件的示例，来给自己的服务端发送通知消息。同时在初始化服务器的时候，监听`TitleEvent`事件，并发送Title指令。
+
+代码参考如下：
+```python
+    @registerGenericClass("UILogicPart")
+    class UILogicPart(PartBase):
+        def __init__(self):
+            PartBase.__init__(self)
+            self.name = "界面服务端监听"
+    
+        def OnRecvTitle(self, args):
+            self.SetCommand("/title @a title {}".format(args["text"]))
+    
+        def InitServer(self):
+            """
+            @description 服务端的零件对象初始化入口
+            """
+            self.ListenSelfEvent("TitleEvent", self, self.OnRecvTitle)
+```
+编写完`界面服务端监听`这个零件后，我们就可以回到界面逻辑的代码文件中，修改按钮回调函数。
+
+在py文件开头处，先引入预设API
+```python
+    import Preset.Controller.PresetApi as presetApi
+```
+然后修改按钮回调函数，先获取`TitleScreen`这个预设，再获取它的零件`界面服务端监听`，随后调用`NotifyToServer`函数，发送我们的事件。
+
+发送完成后关闭这个界面。
+```python
+        def OnConfirmButtonClick(self, args):
+            text = self.GetBaseUIControl(self.mTitleText).asTextEditBox().GetEditText()
+            presetApi.GetPresetByName("TitleScreen").GetPartByName("界面服务端监听").NotifyToServer("TitleEvent", {"text": text})
+            clientApi.PopScreen()
+```
+完整代码如下：
+```python
+    # -*- coding: utf-8 -*-
+    import Preset.Controller.PresetApi as presetApi
+    import mod.client.extraClientApi as clientApi
+    
+    ViewBinder = clientApi.GetViewBinderCls()
+    ViewRequest = clientApi.GetViewViewRequestCls()
+    ScreenNode = clientApi.GetScreenNodeCls()
+    
+    
+    class TitleScreen(ScreenNode):
+        def __init__(self, namespace, name, param):
+            ScreenNode.__init__(self, namespace, name, param)
+            self.mMainPanel = "/main_panel"
+            self.mTitleText = self.mMainPanel + "/title_text"
+            self.mConfirmButton = self.mMainPanel + "/confirm_button"
+    
+        def Create(self):
+            """
+            @description UI创建成功时调用
+            """
+            buttonControl = self.GetBaseUIControl(self.mConfirmButton).asButton()
+            buttonControl.AddTouchEventParams({"isSwallow": True})
+            buttonControl.SetButtonTouchUpCallback(self.OnConfirmButtonClick)
+    
+        def OnConfirmButtonClick(self, args):
+            text = self.GetBaseUIControl(self.mTitleText).asTextEditBox().GetEditText()
+            presetApi.GetPresetByName("TitleScreen").GetPartByName("界面服务端监听").NotifyToServer("TitleEvent", {"text": text})
+            clientApi.PopScreen()
+```
+## 方法二
+
+接下来介绍如何通过数据绑定的方式来获取文本框的数据，绑定按钮的回调函数。
+
+在跟着方法一的步骤操作之后，方法二的区别就主要在`uiScript/TitleScreen.py`这个界面逻辑文件上。
+
+数据绑定的官方说明文档 [点我](<../../../../mcguide/18-界面与交互/70-UI数据绑定.html>)，可以配合本教程食用。
+
+我们查阅UI说明文档，找到我们所使用的界面控件，查看他的详细Json参数。
+
+例如我们这里使用了[按钮](<../../../../mcguide/18-界面与交互/30-UI说明文档.html#image-button>)和[文本编辑框](<../../../../mcguide/18-界面与交互/30-UI说明文档.html#texteditbox>)。
+
+### 按钮
+
+我们主要看文档中的参数解释的最后几个。
+
+可以看到`$pressed_button_name`这个参数，对应了python的类名和对应的函数。`button_mappings`代表了具体映射。
+
+$pressed_button_name | fpsBattle代表编写UI逻辑的python类名，click代表按钮按下时会执行该python类的click函数。也可以使用API AddTouchEventHandler 动态注册按钮回调  
+---|---  
+is_handle_button_move_event | 表示按钮是否可以响应按钮移动事件，需置true配合API AddTouchEventHandler使用  
+button_mappings | 表示按钮事件响应映射网，需置[]配合API AddTouchEventHandler使用  
+  
+我们再打开`资源包/ui/soldier_title_screen.json`这个文件，搜索`common.button`，找到我们的按钮控件。
+
+![](/dev/mcmanual/mc-dev/assets/img/26.b3a12f9e.png)
+
+可以看到，按钮的json配置中已经存在这两个值，接下来我们按照要求修改，删除`button_mappings`这个项，并修改`$pressed_button_name`为`%文件名.函数名`。具体的来说，就是修改为
+```python
+    "$pressed_button_name" : "%TitleScreen.OnConfirmButtonClick",
+```
+**编辑完这个文件之后，建议不要再次用界面编辑器打开这个界面。否则有可能会被自动覆盖，覆盖后需要再次将`button_mappings`删除**
+
+接下来回到`TitleScreen.py`，为`OnConfirmButtonClick`添加绑定，在函数的上一行，添加`@ViewBinder.binding(ViewBinder.BF_ButtonClickUp)`。
+
+同时删除按钮监听的相关函数。
+```python
+        def Create(self):
+            """
+            @description UI创建成功时调用
+            """
+            pass
+    
+        @ViewBinder.binding(ViewBinder.BF_ButtonClickUp)
+        def OnConfirmButtonClick(self, args):
+            text = self.GetBaseUIControl(self.mTitleText).asTextEditBox().GetEditText()
+            presetApi.GetPresetByName("TitleScreen").GetPartByName("界面服务端监听").NotifyToServer("TitleEvent", {"text": text})
+            clientApi.PopScreen()
+```
+### 文本编辑框
+
+接下来继续看文本编辑框的绑定。
+
+绑定的参数主要是`$text_edit_box_content_binding_name`和`$text_box_name`，
+
+我们参考文档中的注1，定义一个变量，存储文本框中的实时内容。
+
+然后定义2个函数，一个赋值，一个返回值，并且修改按钮的回调函数，让按钮从我们定义的这个变量获取文本内容。
+```python
+    class TitleScreen(ScreenNode):
+        def __init__(self, namespace, name, param):
+            ScreenNode.__init__(self, namespace, name, param)
+            self.mText = ""
+    
+        @ViewBinder.binding(ViewBinder.BF_EditChanged | ViewBinder.BF_EditFinished)
+        def TextBox(self, args):
+            self.mText = args["Text"]
+            return ViewRequest.Refresh
+    
+        @ViewBinder.binding(ViewBinder.BF_BindString)
+        def ReturnTextString(self):
+            return self.mText
+    
+        @ViewBinder.binding(ViewBinder.BF_ButtonClickUp)
+        def OnConfirmButtonClick(self, args):
+            presetApi.GetPresetByName("TitleScreen").GetPartByName("界面服务端监听").NotifyToServer("TitleEvent", {"text": self.mText})
+            clientApi.PopScreen()
+```
+那么不难发现，其实数据绑定，只是将一个函数，绑定一个对应的类型，并将其体现到json中。
+
+例如`ReturnTextString`就返回了一个str类型的变量，并且binding中的类型也是`BF_BindString`，一个文本变量。
+
+同样的，如果json中需要填写的是int类型的变量，我们也可以定义一个int变量，然后使用binding，绑定`BF_BindInt`，然后返回这个值，并在json文件中修改对应的函数。
+
+接下来我们再修改Json，将对应的配置和我们的类与函数匹配。
+```python
+    						"$text_box_name" : "%TitleScreen.TextBox",
+                            "$text_edit_box_content_binding_name" : "#TitleScreen.ReturnTextString",
+```
+上方截取了部分重要的json配置，修改完成后就应该是这样的。
+
+截至目前就修改完成。
+
+界面的完整代码可以在这里[下载 (opens new window)](<https://g79.gdl.netease.com/Cpp_AddOn_PartUI.zip>)，其中`行为包/uiScript/TitleScreen_V1.py`为方法一的代码，供大家参考。
+
+进阶
+
+30分钟
