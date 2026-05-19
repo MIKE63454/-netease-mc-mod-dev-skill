@@ -11,6 +11,10 @@ NetEase Minecraft mods use **Mod SDK** — a Python-based framework that wraps g
 
 Client-Server architecture: **server** handles logic/data, **client** handles rendering/UI. Scripts for each side are isolated — use **custom events** for cross-side communication, never cross-import.
 
+**API Reference Files:** When you need specific event parameters, component method signatures, or enum values, load the reference files:
+- `api-events.md` — All engine events with trigger conditions and parameters
+- `api-components.md` — All component factory methods, signatures, key enums, and system APIs
+
 ## Quick Reference
 
 ### Mod File Structure
