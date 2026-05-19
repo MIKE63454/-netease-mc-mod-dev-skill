@@ -320,12 +320,21 @@ itemDict = {"itemName": "mymod:custom_sword", "count": 1, "auxValue": 0}
 
 Use Minecraft format codes (string with `§` prefix):
 
-| Code | Color | Code | Color |
+| Code | Effect | Code | Effect |
 |---|---|---|---|
-| `§a` | Green | `§c` | Red |
-| `§e` | Yellow | `§b` | Aqua |
-| `§7` | Gray | `§f` | White |
-| `§l` | **Bold** | `§r` | Reset |
+| `§0` | Black | `§1` | Dark Blue |
+| `§2` | Dark Green | `§3` | Dark Aqua |
+| `§4` | Dark Red | `§5` | Dark Purple |
+| `§6` | Gold | `§7` | Gray |
+| `§8` | Dark Gray | `§9` | Blue |
+| `§a` | Green | `§b` | Aqua |
+| `§c` | Red | `§d` | Light Purple |
+| `§e` | Yellow | `§f` | White |
+| `§l` | **Bold** | `§m` | ~~Strikethrough~~ |
+| `§n` | <u>Underline</u> | `§o` | *Italic* |
+| `§k` | Obfuscated | `§r` | Reset |
+
+> Example: `"§c§lBOSS DEFEATED!§r"` → bold red text, then reset.
 
 ## Critical Conventions
 

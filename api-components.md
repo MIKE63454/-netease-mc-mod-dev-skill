@@ -27,6 +27,25 @@ factory = clientApi.GetEngineCompFactory()
 | `CreateLv(entityId)` | Server | LevelComponentServer | Player levels |
 | `CreateItemBanned(levelId)` | Server | ItemBannedCompServer | Ban items |
 | `CreateEntityDefinitions(entityId)` | Server | EntityDefinitionsCompServer | Entity NBT data |
+| `CreateExtraData(entityId)` | Server | ExtraDataCompServer | Persistent key-value storage (survives re-login) |
+| `CreateEffect(entityId)` | Server | EffectCompServer | Status effects (potion effects) |
+
+---
+
+### ExtraData Component (CreateExtraData)
+
+```python
+comp = serverApi.GetEngineCompFactory().CreateExtraData(entityId)
+```
+
+| Method | Parameters | Returns | Description |
+|---|---|---|---|
+| `SetExtraData(key, value)` | key(str), value(any) | bool | Save a value (dict, list, int, str, bool OK) |
+| `GetExtraData(key)` | key(str) | any/None | Read a saved value by key |
+| `GetAllExtraData()` | — | dict | Get all saved key-value pairs |
+| `SaveExtraData()` | — | bool | Commit to disk (auto-saved on game quit too) |
+
+> Use `playerId` for player-specific data, `levelId` for world-level data.
 
 ---
 

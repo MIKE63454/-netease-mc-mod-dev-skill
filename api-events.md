@@ -53,7 +53,8 @@
 | Event | Trigger | Key Parameters |
 |---|---|---|
 | `OnFireHurtEvent` | Entity takes fire damage | `id`(str), `ignite`(bool) |
-| `AddEntityServerEvent` | Entity created/loaded | `id`(str), `engineTypeStr`(str), `posX/Y/Z`(float) |
+
+> Note: `AddEntityServerEvent` (see World Events) also fires for entities. The engine does not have a generic `EntityHurtEvent`; use `PlayerHurtEvent` for player damage and `OnFireHurtEvent` for fire damage to mobs.
 
 ---
 
@@ -74,6 +75,22 @@
 ---
 
 ## Event Patterns
+
+### Key Parameter Naming Inconsistency (IMPORTANT)
+
+The engine uses different parameter names for the same concept across events. Always check the exact parameter name for each event:
+
+| Event | Player ID param | Entity ID param |
+|---|---|---|
+| `AddServerPlayerEvent` | `id` | — |
+| `ServerChatEvent` | `playerId` | — |
+| `PlayerDieEvent` | `id` | `attacker` |
+| `PlayerHurtEvent` | `id` | `attacker` |
+| `PlayerRespawnEvent` | `id` | — |
+| `PlayerRespawnFinishServerEvent` | `playerId` | — |
+| `ServerBlockUseEvent` | `playerId` | — |
+
+> **Rule:** Always use `args.get("id")` for `*Player*` events but check `api-events.md` for the exact name. Using the wrong key silently returns `None` instead of throwing an error.
 
 ### Listening to Server Events
 
@@ -109,18 +126,4 @@ def ListenEvent(self):
 
 ### Cross-Side Communication
 
-Server → Client:
-```python
-# Server side
-self.NotifyToClient(playerId, "CustomEventName", {"key": "value"})
-
-# Client side: Listen for the same custom event
-```
-
-Client → Server:
-```python
-# Client side
-self.NotifyToServer("CustomEventName", {"key": "value"})
-
-# Server side: Listen for the same custom event
-```
+See SKILL.md "Server ↔ Client Communication" section for complete examples with both sides' listening code.
