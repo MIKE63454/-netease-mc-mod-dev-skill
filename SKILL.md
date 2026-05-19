@@ -407,6 +407,11 @@ No IDE breakpoint support. Debug entirely via log output. Hot-reload works for *
 | `KeyError` in event callback | Event param name differs from docs | Check [[api-events]] for exact parameter names |
 | Chinese text garbled in logs | Missing UTF-8 header | Add `# -*- coding: utf-8 -*-` at top of file |
 | Mod works in editor but not after publish | UUID collision or missing files | Regenerate UUIDs; verify all files included in pack |
+| Mod upload fails with "打包失败" | Python syntax error, or path too deep (>150 chars) | Check Python syntax; shorten directory nesting |
+| Mod fails loading on mobile/console | Filenames contain Chinese or special chars | Rename all files/folders to ASCII only (no Chinese in behavior_pack/resource_pack) |
+| `JSON format error (code 3001)` | Malformed JSON in addon config | Use VSCode to open JSON — red squiggles show errors |
+| `Custom item ID error (code 5001)` | Item identifier mismatch | Verify namespace:name format matches between JSON and code |
+| `ItemDict` silently not working | Missing or wrong key names | Use exact keys: `itemName` (not `item_name`), `count`, `auxValue` |
 
 ## Manifest Format
 

@@ -29,6 +29,66 @@ factory = clientApi.GetEngineCompFactory()
 | `CreateEntityDefinitions(entityId)` | Server | EntityDefinitionsCompServer | Entity NBT data |
 | `CreateExtraData(entityId)` | Server | ExtraDataCompServer | Persistent key-value storage (survives re-login) |
 | `CreateEffect(entityId)` | Server | EffectCompServer | Status effects (potion effects) |
+| `CreateCommand(levelId)` | Server | CommandCompServer | Execute game commands from script |
+| `CreateEntityEvent(entityId)` | Server | EntityEventComponentServer | Entity runtime behavior modification |
+
+---
+
+### Command Component (CreateCommand)
+
+```python
+comp = serverApi.GetEngineCompFactory().CreateCommand(levelId)
+```
+
+| Method | Parameters | Returns | Description |
+|---|---|---|---|
+| `SetCommand(cmdStr, entityId?, showOutput?)` | cmdStr(str), entityId(str, optional), showOutput(bool, optional) | bool | Execute a game command (like typing in chat). Set `showOutput=True` to see results. |
+| `GetCommandPermissionLevel()` | — | int | Get OP permission level |
+
+**Common usage examples:**
+```python
+comp = serverApi.GetEngineCompFactory().CreateCommand(serverApi.GetLevelId())
+# Teleport player
+comp.SetCommand("/tp @a[name={}] 100 64 100".format(playerName))
+# Change game mode
+comp.SetCommand("/gamemode creative @a[name={}]".format(playerName))
+# Set world time
+comp.SetCommand("/time set 0")
+# Give item
+comp.SetCommand("/give @a[name={}] minecraft:diamond_sword".format(playerName))
+```
+
+> SetCommand is the universal escape hatch — any vanilla console command can be called from Python. Use for teleport, gamemode, time, weather, gamerule changes, etc.
+
+### Entity Event Component (CreateEntityEvent)
+
+```python
+comp = serverApi.GetEngineCompFactory().CreateEntityEvent(entityId)
+```
+
+| Method | Parameters | Returns | Description |
+|---|---|---|---|
+| `AddActorComponent(componentName, componentValue)` | componentName(str), componentValue(json str) | bool | Add/modify entity component at runtime (e.g., change attack damage) |
+| `AddActorComponentGroup(groupName)` | groupName(str) | bool | Activate a pre-configured component_group from entity JSON |
+| `RemoveActorComponent(componentName)` | componentName(str) | bool | Remove a component |
+| `RemoveActorComponentGroup(groupName)` | groupName(str) | bool | Deactivate a component_group |
+| `Hurt(damage, cause, attackerId?, customTag?)` | damage(int), cause(ActorDamageCause), attackerId(str, optional), customTag(str, optional) | bool | Inflict damage on entity |
+| `SetPos(pos)` | pos(tuple(float,float,float)) | bool | Teleport entity to position |
+| `SetRot(rot)` | rot(tuple(float,float)) | bool | Set entity rotation (yaw, pitch) |
+| `GetPos()` | — | tuple(float,float,float) | Get entity position |
+| `GetRot()` | — | tuple(float,float) | Get entity rotation |
+
+**Usage example:**
+```python
+comp = serverApi.GetEngineCompFactory().CreateEntityEvent(entityId)
+# Change mob attack to 99
+comp.AddActorComponent("minecraft:attack", '{"damage": 99}')
+# Inflict 10 fall damage
+comp.Hurt(10, serverApi.GetMinecraftEnum().ActorDamageCause.Fall)
+# Teleport entity up 10 blocks
+pos = comp.GetPos()
+comp.SetPos((pos[0], pos[1] + 10, pos[2]))
+```
 
 ---
 
@@ -142,6 +202,11 @@ comp = serverApi.GetEngineCompFactory().CreateGame(levelId)
 | `KillEntity(entityId)` | entityId(str) | bool | Kill an entity |
 | `GetEntitiesInSquareArea(pos, axis, halfLength)` | pos(tuple), axis(str), halfLength(int) | list(str) | Get entity IDs in square area |
 | `GetEntitiesInSphereArea(pos, radius)` | pos(tuple), radius(int) | list(str) | Get entity IDs in sphere area |
+| `CanSee(fromId, targetId, viewRange?, ...)` | fromId(str), targetId(str), viewRange(float) | bool | Check line-of-sight between two entities |
+| `GetAllScoreboardObjects()` | — | list(dict) | Get all scoreboard objectives |
+| `GetAllPlayerScoreboardObjects()` | — | list(dict) | Get player-specific scoreboard info |
+| `SetPlayerScoreboardValue(playerId, objName, value)` | playerId(str), objName(str), value(int) | bool | Set a player's score on an objective |
+| `AddPlayerScoreboardValue(playerId, objName, value)` | playerId(str), objName(str), value(int) | bool | Add to a player's score on an objective |
 
 ---
 
