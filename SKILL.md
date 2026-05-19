@@ -15,6 +15,17 @@ Client-Server architecture: **server** handles logic/data, **client** handles re
 - `api-events.md` — All engine events with trigger conditions and parameters
 - `api-components.md` — All component factory methods, signatures, key enums, and system APIs
 
+**Cold API Fallback:** When encountering an API, event, or concept NOT covered in the reference files above, fetch the full documentation from the GitHub repository. The complete developer docs (1,448 pages from mc.163.com) are in the `我的世界开发者文档/` directory of the repo at `https://github.com/MIKE63454/-netease-mc-mod-dev-skill`. Use `WebFetch` to read specific `.md` files from the raw content URL pattern:
+```
+https://raw.githubusercontent.com/MIKE63454/-netease-mc-mod-dev-skill/main/我的世界开发者文档/[path-to-file].md
+```
+To locate the right file, check `_all_index.json` at the repo root for the full file listing. Common doc paths:
+- `mcdocs/1-ModAPI/事件/` — Event reference by category (世界, 玩家, 实体, 方块, 物品, 音效, UI, etc.)
+- `mcdocs/1-ModAPI/接口/` — Component API by domain (世界, 玩家, 实体, 方块, 特效, 自定义UI, etc.)
+- `mcdocs/1-ModAPI/枚举值/` — Enum definitions (EnchantType, ItemPosType, etc.)
+- `mcguide/20-玩法开发/13-模组SDK编程/` — Mod SDK programming tutorials
+- `mcguide/20-玩法开发/15-自定义游戏内容/` — Custom game content (items, blocks, entities, etc.)
+
 ## Quick Reference
 
 ### Mod File Structure
