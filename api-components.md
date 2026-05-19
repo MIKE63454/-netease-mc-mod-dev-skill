@@ -349,6 +349,93 @@ class GameType:
     Spectator = 3  # (may not be available)
 ```
 
+### EffectType (status effects)
+
+String identifiers for status effects. Use with `CreateEffect` factory:
+
+```python
+# serverApi.GetMinecraftEnum().EffectType.xxx
+class EffectType:
+    EMPTY_EFFECT = "empty"
+    MOVEMENT_SPEED = "speed"            # Walk speed boost
+    MOVEMENT_SLOWDOWN = "slowness"      # Walk speed reduction
+    DIG_SPEED = "haste"                 # Mining/attack speed boost
+    DIG_SLOWDOWN = "mining_fatigue"     # Mining/attack speed reduction
+    DAMAGE_BOOST = "strength"           # Melee attack damage boost
+    HEAL = "instant_health"             # Instant heal (damages undead)
+    HARM = "instant_damage"             # Instant damage (heals undead)
+    JUMP = "jump_boost"                 # Jump height boost
+    CONFUSION = "nausea"                # Vision distortion
+    REGENERATION = "regeneration"       # Health regen over time
+    DAMAGE_RESISTANCE = "resistance"    # Reduce most damage
+    FIRE_RESISTANCE = "fire_resistance" # Immune to fire damage
+    WATER_BREATHING = "water_breathing" # No oxygen consumption underwater
+    INVISIBILITY = "invisibility"       # Invisible
+    BLINDNESS = "blindness"             # Reduced vision, no sprint/crit
+    NIGHT_VISION = "night_vision"       # Increased brightness
+    HUNGER = "hunger"                   # Increased hunger rate
+    WEAKNESS = "weakness"               # Reduced melee damage
+    POISON = "poison"                   # Damage over time (non-lethal)
+    WITHER = "wither"                   # Damage over time (lethal)
+    HEALTH_BOOST = "health_boost"       # Increase max HP
+    ABSORPTION = "absorption"           # Absorption hearts
+    SATURATION = "saturation"           # Restore hunger/saturation
+    LEVITATION = "levitation"           # Float upward
+    SLOW_FALLING = "slow_falling"       # Slow falling, reduce fall damage
+    CONDUIT_POWER = "conduit_power"     # Underwater benefits
+    DARKNESS = "darkness"               # Screen darkening, limited vision
+```
+
+### EnchantType (enchantment IDs)
+
+```python
+# serverApi.GetMinecraftEnum().EnchantType.xxx
+# Numeric IDs for vanilla enchantments:
+class EnchantType:
+    ArmorAll = 0             # Protection
+    ArmorFire = 1            # Fire Protection
+    ArmorFall = 2            # Feather Falling
+    ArmorExplosive = 3       # Blast Protection
+    ArmorProjectile = 4      # Projectile Protection
+    ArmorThorns = 5          # Thorns
+    WaterBreath = 6          # Respiration
+    WaterSpeed = 7           # Depth Strider
+    WaterAffinity = 8        # Aqua Affinity
+    WeaponDamage = 9         # Sharpness
+    WeaponUndead = 10        # Smite
+    WeaponArthropod = 11     # Bane of Arthropods
+    WeaponKnockback = 12     # Knockback
+    WeaponFire = 13          # Fire Aspect
+    WeaponLoot = 14          # Looting
+    MiningEfficiency = 15    # Efficiency
+    MiningSilkTouch = 16     # Silk Touch
+    MiningDurability = 17    # Unbreaking
+    MiningLoot = 18          # Fortune
+    BowDamage = 19           # Power
+    BowKnockback = 20        # Punch
+    BowFire = 21             # Flame
+    BowInfinity = 22         # Infinity
+    FishingLoot = 23         # Luck of the Sea
+    FishingLure = 24         # Lure
+    FrostWalker = 25         # Frost Walker
+    Mending = 26             # Mending
+    CurseBinding = 27        # Curse of Binding
+    CurseVanishing = 28      # Curse of Vanishing
+    TridentImpaling = 29     # Impaling
+    TridentRiptide = 30      # Riptide
+    TridentLoyalty = 31      # Loyalty
+    TridentChanneling = 32   # Channeling
+    CrossbowMultishot = 33   # Multishot
+    CrossbowPiercing = 34    # Piercing
+    CrossbowQuickCharge = 35 # Quick Charge
+    SoulSpeed = 36           # Soul Speed
+    SwiftSneak = 37          # Swift Sneak
+    WindBurst = 38           # Wind Burst
+    Density = 39             # Density
+    Breach = 40              # Breach
+    ModEnchant = 255         # Custom enchantment
+```
+
 ---
 
 ## System API Reference
