@@ -43,9 +43,26 @@
 
 ### Block/Item Events (方块/物品)
 
+**Item Events:**
+
+| Event | Trigger | Key Parameters |
+|---|---|---|
+| `ServerItemUseOnEvent` | Player right-clicks on block with item | `entityId`, `itemDict`, `x/y/z`, `blockName`, `ret`(bool, modifiable) |
+| `ActorUseItemServerEvent` | Player uses item | `playerId`, `itemDict`, `useMethod` |
+| `ServerItemTryUseEvent` | Player attempts to use item (cancelable) | `playerId`, `itemDict`, `cancel`(bool) |
+| `ActorAcquiredItemServerEvent` | Player acquires any item | `playerId`, `itemDict` |
+| `OnCarriedNewItemChangedServerEvent` | Main-hand item swap | `playerId`, `oldItem`, `newItem` |
+| `ItemDurabilityChangedServerEvent` | Item durability changes (modifiable) | `entityId`, `itemDict`, `durability`(int), `canChange`(bool) |
+
+**Block Events:**
+
 | Event | Trigger | Key Parameters |
 |---|---|---|
 | `ServerBlockUseEvent` | Player right-clicks / interacts with block | `blockName`(str), `playerId`(str), `x/y/z`(int) |
+| `ServerPlayerTryDestroyBlockEvent` | Player about to destroy block (cancelable) | `x/y/z`, `fullName`, `playerId`, `cancel`(bool), `spawnResources`(bool) |
+| `ServerEntityTryPlaceBlockEvent` | Entity about to place block (cancelable) | `x/y/z`, `fullName`, `entityId`, `cancel`(bool) |
+| `EntityPlaceBlockAfterServerEvent` | After block placed | `x/y/z`, `fullName`, `entityId` |
+| `BlockRandomTickServerEvent` | Block random tick (custom crops) | `x/y/z`, `fullName`, `blockName` |
 | `ServerBlockEntityTickEvent` | Block entity tick | `blockName`(str), `pos`(dict) |
 
 ### Entity Events (实体)

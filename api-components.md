@@ -31,6 +31,28 @@ factory = clientApi.GetEngineCompFactory()
 | `CreateEffect(entityId)` | Server | EffectCompServer | Status effects (potion effects) |
 | `CreateCommand(levelId)` | Server | CommandCompServer | Execute game commands from script |
 | `CreateEntityEvent(entityId)` | Server | EntityEventComponentServer | Entity runtime behavior modification |
+| `CreateHurt(entityId)` | Server | HurtCompServer | Inflict damage on entities |
+
+---
+
+### Hurt Component (CreateHurt)
+
+```python
+comp = serverApi.GetEngineCompFactory().CreateHurt(entityId)
+```
+
+| Method | Parameters | Returns | Description |
+|---|---|---|---|
+| `Hurt(damage, cause, attackerId?, childAttackerId?, knocked?, customTag?)` | damage(float), cause(str), attackerId(str), childAttackerId(str), knocked(bool), customTag(str) | bool | Inflict damage on entity. `cause` from ActorDamageCause enum. |
+| `ImmuneDamage(immune)` | immune(bool) | bool | Set entity immune/unimmune to all damage (persists to save) |
+
+**Usage:**
+```python
+comp = serverApi.GetEngineCompFactory().CreateHurt(entityId)
+cause = serverApi.GetMinecraftEnum().ActorDamageCause.Magic
+comp.Hurt(20.0, cause, attackerId)  # Deal 20 magic damage
+comp.ImmuneDamage(True)             # Make invincible
+```
 
 ---
 
@@ -136,13 +158,21 @@ comp = serverApi.GetEngineCompFactory().CreateItem(entityId)
 
 ```python
 itemDict = {
-    "itemName": "minecraft:diamond_sword",  # Namespace:name
-    "count": 1,                              # Stack count
-    "auxValue": 0,                           # Damage/aux value
-    "enchantData": [(enchantType, level)],   # Optional: enchantments
-    "customTips": "Custom name",             # Optional: display name
-    "extraId": "unique_id",                  # Optional: unique identifier
-    "userData": {}                            # Optional: custom data
+    # Required fields (modern API, v1.23+):
+    "newItemName": "minecraft:diamond_sword",     # Namespace:name (preferred)
+    "newAuxValue": 0,                             # Aux value (preferred)
+    # Deprecated but still common (pre-1.23):
+    # "itemName": "minecraft:diamond_sword",      # (deprecated, use newItemName)
+    # "auxValue": 0,                              # (deprecated, use newAuxValue)
+    "count": 1,                                   # Stack count
+    # Optional fields:
+    "showInHand": True,                           # Display in hand
+    "enchantData": [(enchantType, level)],        # Vanilla enchantments
+    "modEnchantData": [("custom_id", level)],     # Custom enchantments
+    "customTips": "§c Custom Name",               # Display name / tooltip
+    "extraId": "unique_key",                      # Custom identifier
+    "userData": {},                               # NBT data
+    "durability": 100,                            # Item durability
 }
 ```
 
@@ -261,38 +291,53 @@ LEG    = 2  # Leggings
 FOOT   = 3  # Boots
 ```
 
-### ActorDamageCause (damage cause IDs)
+### ActorDamageCause (damage cause identifiers)
+
+The SDK uses **string** identifiers, NOT numeric IDs:
+
 ```python
+# serverApi.GetMinecraftEnum().ActorDamageCause.xxx
 class ActorDamageCause:
-    None_ = -1
-    Override = 0
-    Contact = 1          # Cactus, etc.
-    EntityAttack = 2
-    Projectile = 3
-    Suffocation = 4
-    Fall = 5
-    Fire = 6
-    FireTick = 7
-    Lava = 8
-    Drowning = 9
-    BlockExplosion = 10
-    EntityExplosion = 11
-    Void = 12
-    Suicide = 13
-    Magic = 14
-    Wither = 15
-    Starve = 16
-    Anvil = 17
-    Thorns = 18
-    FallingBlock = 19
-    Piston = 20
-    FlyIntoWall = 21
-    Magma = 22
-    Fireworks = 23
-    Lightning = 24
-    Freezing = 25
-    Stalactite = 26
-    Stalagmite = 27
+    NONE = "none"
+    Override = "override"
+    Contact = "contact"                  # Cactus, etc.
+    EntityAttack = "entity_attack"
+    Projectile = "projectile"
+    Suffocation = "suffocation"
+    Fall = "fall"
+    Fire = "fire"
+    FireTick = "fire_tick"
+    Lava = "lava"
+    Drowning = "drowning"
+    BlockExplosion = "block_explosion"
+    EntityExplosion = "entity_explosion"
+    Void = "void"
+    Suicide = "suicide"
+    Magic = "magic"
+    Wither = "wither"
+    Starve = "starve"
+    Anvil = "anvil"
+    Thorns = "thorns"
+    FallingBlock = "falling_block"
+    Piston = "piston"
+    FlyIntoWall = "fly_into_wall"
+    Magma = "magma"
+    Fireworks = "fireworks"
+    Lightning = "lightning"
+    Freezing = "freezing"
+    Stalactite = "stalactite"
+    Stalagmite = "stalagmite"
+    Custom = "custom"                    # triggers customTag matching
+    SonicBoom = "sonic_boom"
+    Campfire = "campfire"
+    SoulCampfire = "soul_campfire"
+    MaceSmash = "mace_smash"
+```
+
+Usage:
+```python
+cause = serverApi.GetMinecraftEnum().ActorDamageCause.Fall  # returns "fall"
+comp.Hurt(10, cause)  # Inflict 10 fall damage
 ```
 
 ### GameType (game modes)
