@@ -17,8 +17,9 @@ Client-Server architecture: **server** handles logic/data, **client** handles re
 
 **Cold API Fallback:** When encountering an API, event, or concept NOT covered in the reference files above, fetch the full documentation from the GitHub repository. The complete developer docs (1,448 pages from mc.163.com) are in the `我的世界开发者文档/` directory of the repo at `https://github.com/MIKE63454/-netease-mc-mod-dev-skill`. Use `WebFetch` to read specific `.md` files from the raw content URL pattern:
 ```
-https://raw.githubusercontent.com/MIKE63454/-netease-mc-mod-dev-skill/main/我的世界开发者文档/[path-to-file].md
+https://raw.githubusercontent.com/MIKE63454/-netease-mc-mod-dev-skill/main/%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%BC%80%E5%8F%91%E8%80%85%E6%96%87%E6%A1%A3/[path].md
 ```
+(URL-encoded: `我的世界开发者文档` → `%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%BC%80%E5%8F%91%E8%80%85%E6%96%87%E6%A1%A3`)
 To locate the right file, check `_all_index.json` at the repo root for the full file listing. Common doc paths:
 - `mcdocs/1-ModAPI/事件/` — Event reference by category (世界, 玩家, 实体, 方块, 物品, 音效, UI, etc.)
 - `mcdocs/1-ModAPI/接口/` — Component API by domain (世界, 玩家, 实体, 方块, 特效, 自定义UI, etc.)
@@ -113,7 +114,7 @@ class MyServerSystem(ServerSystem):
         # Give item using factory pattern:
         comp = serverApi.GetEngineCompFactory().CreateItem(playerId)
         comp.SpawnItemToPlayerInv(
-            {"itemName": "minecraft:diamond_sword", "count": 1, "auxValue": 0},
+            {"newItemName": "minecraft:diamond_sword", "count": 1, "newAuxValue": 0},
             playerId
         )
         # Send message:
@@ -291,50 +292,43 @@ def OnBlockUse(self, args):
 itemDict = {"itemName": "mymod:custom_sword", "count": 1, "auxValue": 0}
 ```
 
-## Commonly Used Events
+## Common Recipes
 
-### Server-Side Events (Top 8)
+> Map user requests to the right approach. Detail APIs in `[[api-events]]` and `[[api-components]]`.
 
-| Event Name | Trigger | Key args |
+| User wants to... | Listen to | Use component |
 |---|---|---|
-| `AddServerPlayerEvent` | Player joins | `id` (playerId) |
-| `ServerChatEvent` | Player sends chat | `message`, `playerId`, `cancel`, `bChatById` |
-| `PlayerHurtEvent` | Player takes damage | `id`, `attacker`, `cause` |
-| `PlayerDieEvent` | Player dies | `id`, `attacker`, `cause` |
-| `PlayerRespawnFinishServerEvent` | Player respawn complete (safe) | `playerId` |
-| `ServerBlockUseEvent` | Player interacts with block | `blockName`, `playerId`, `x/y/z` |
-| `AddEntityServerEvent` | Entity created/loaded | `id`, `engineTypeStr`, `posX/Y/Z` |
-| `ClientLoadAddonsFinishServerEvent` | Client mod loading done | — trigger client data init |
+| Welcome message + starter item | `AddServerPlayerEvent` | `CreateMsg`, `CreateItem` |
+| Chat commands (/give, /heal) | `ServerChatEvent` | `CreateItem`, `CreatePlayer`, `CreateCommand` |
+| Custom block interaction | `ServerBlockUseEvent` | `CreateItem`, `CreateMsg` |
+| Custom item effect on use | `ActorUseItemServerEvent` | `CreateHurt`, `CreateEffect` |
+| Prevent block break/place | `ServerPlayerTryDestroyBlockEvent` / `ServerEntityTryPlaceBlockEvent` | (set `cancel=True` in args) |
+| Boss fight / custom damage | `OnScriptTickServer` + `PlayerHurtEvent` | `CreateHurt`, `CreateEntityEvent` |
+| Scoreboard / minigame stats | `OnScriptTickServer` + `PlayerDieEvent` | `CreateCommand` (SetCommand for /scoreboard) |
+| Data that survives re-login | `PlayerRespawnFinishServerEvent` | `CreateExtraData` (save on quit, load on join) |
+| Show UI to player | `OnLocalPlayerStopLoading` | `NotifyToClient` → client creates UI |
+| Server-wide broadcast | `AddServerPlayerEvent` | `CreateMsg` + iterate players |
 
-### Client-Side Events (Top 3)
+### Broadcast to All Players
 
-| Event Name | Trigger | Key args |
-|---|---|---|
-| `OnLocalPlayerStopLoading` | Player fully loaded | `id` |
-| `AddEntityClientEvent` | Entity created (client) | `id`, `engineTypeStr` |
-| `OnScriptTickClient` | Every frame (variable) | — |
+```python
+# Simple broadcast (simulates a player saying something)
+msgComp = serverApi.GetEngineCompFactory().CreateMsg(serverApi.GetLevelId())
+msgComp.SendMsg("§6[Server]", "A boss has spawned in the Nether!")
 
-> Full event reference with all parameters: see [[api-events]]
+# Send individual messages to every online player
+# Player IDs are stored in the system; track them on AddServerPlayerEvent/DelServerPlayerEvent
+self.onlinePlayers = set()
+def OnPlayerJoin(self, args):
+    self.onlinePlayers.add(args["id"])
+def OnPlayerLeave(self, args):
+    self.onlinePlayers.discard(args["id"])
+def broadcast(self, msg, color="§e"):
+    for pid in self.onlinePlayers:
+        serverApi.GetEngineCompFactory().CreateMsg(pid).NotifyOneMessage(pid, msg, color)
+```
 
-## Color Codes
-
-Use Minecraft format codes (string with `§` prefix):
-
-| Code | Effect | Code | Effect |
-|---|---|---|---|
-| `§0` | Black | `§1` | Dark Blue |
-| `§2` | Dark Green | `§3` | Dark Aqua |
-| `§4` | Dark Red | `§5` | Dark Purple |
-| `§6` | Gold | `§7` | Gray |
-| `§8` | Dark Gray | `§9` | Blue |
-| `§a` | Green | `§b` | Aqua |
-| `§c` | Red | `§d` | Light Purple |
-| `§e` | Yellow | `§f` | White |
-| `§l` | **Bold** | `§m` | ~~Strikethrough~~ |
-| `§n` | <u>Underline</u> | `§o` | *Italic* |
-| `§k` | Obfuscated | `§r` | Reset |
-
-> Example: `"§c§lBOSS DEFEATED!§r"` → bold red text, then reset.
+> Player IDs look like negative longs: `"-4294967295"`. Always store and compare as `str`.
 
 ## Critical Conventions
 
@@ -380,38 +374,79 @@ Logs appear in MC Studio's "脚本测试日志" (Script Test Log) window.
 
 No IDE breakpoint support. Debug entirely via log output. Hot-reload works for **function body changes** only — global variables, new classes, or new files require re-entering the world.
 
-## Common Mistakes
+### DestroyServer / DestroyClient
 
-| Mistake | Fix |
-|---|---|
-| Passing class instance to `RegisterSystem` | Pass a string module path |
-| Importing `serverApi` in client scripts | Use `clientApi` for client-side imports |
-| Using Python 3 syntax (f-strings, `super()`) | Use `%s` formatting, explicit `__init__` call |
-| Forgetting `__init__.py` | Always create empty `__init__.py` |
-| Naming scripts folder too generically | Use `[TeamName][ModName]Scripts` pattern |
-| Cross-importing ServerSystem from ClientSystem | Use custom events for cross-side communication |
-| Nesting `modMain.py` in a subfolder | Place it directly in the scripts root folder |
-| Using bare `print` for logging | Use `from mod_log import logger` |
+These lifecycle hooks are for cleanup — use them when you need to:
+- Save persistent data before the world unloads: `CreateExtraData().SaveExtraData()`
+- Restore game rules to defaults: `SetCommand("/gamerule doDaylightCycle true")`
+- Clean up custom entities or structures you created in `InitServer`
 
-## Troubleshooting
+```python
+@Mod.DestroyServer()
+def serverDestroy(self):
+    comp = serverApi.GetEngineCompFactory().CreateExtraData(serverApi.GetLevelId())
+    comp.SaveExtraData()
+    logger.info("[MyMod] Data saved on shutdown")
+```
+
+### Server → All Clients Broadcast
+
+```python
+# Server side: send to all online players at once
+self.BroadcastToAllClient("MyMod_Announce", {"title": "Event!", "body": "A wild boss appears!"})
+
+# Client side: each client listens normally
+def ListenEvent(self):
+    self.ListenForEvent("MyMod", "MyClientSystem", "MyMod_Announce", self, self.OnAnnounce)
+```
+
+Unlike `NotifyToClient(playerId, ...)` which targets one player, `BroadcastToAllClient` sends to every connected client.
+
+## Common Mistakes & Troubleshooting
+
+### Coding Mistakes
+
+| Mistake | Symptom | Fix |
+|---|---|---|
+| Passing class instance to `RegisterSystem` | Mod silently not loading | Pass string path: `"ScriptsFolder.file.ClassName"` |
+| Importing `serverApi` in client scripts | Component not working, event not firing | Use `clientApi` for client-side imports |
+| Python 3 syntax (f-strings, `super()`) | `SyntaxError` in game log | Use `%s` formatting, explicit `__init__` call |
+| Forgetting `__init__.py` | `ImportError: No module named XxxScripts` | Create empty `__init__.py` in scripts folder |
+| Naming scripts folder too generically | Name collision with other mods | Use `[TeamName][ModName]Scripts` pattern |
+| Cross-importing ServerSystem ↔ ClientSystem | Silent failure on one side | Use custom events: `NotifyToClient` / `NotifyToServer` |
+| Nesting `modMain.py` in a subfolder | Mod works on PC, fails on mobile | Place `modMain.py` directly in `[Name]Scripts/` |
+| Using bare `print` for logging | Can't find output; log window empty | Use `from mod_log import logger` |
+
+### Runtime Errors
 
 | Symptom | Likely Cause | Fix |
 |---|---|---|
-| `ImportError: No module named mod_log` | Python env missing SDK stub | `pip install mc-netease-sdk` in Python 2 |
-| `System not registered` or mod not loading | `RegisterSystem` path doesn't match file structure | Verify triple match: `ScriptsFolder.fileName.ClassName` |
-| Mod works on PC but not mobile | `modMain.py` not at scripts root | Move `modMain.py` directly into `[Name]Scripts/` folder |
+| `ImportError: No module named mod_log` | Python env missing SDK stub | `pip install mc-netease-sdk` for Python 2 |
+| `System not registered` or mod not loading | `RegisterSystem` path mismatch | Verify: `ScriptsFolder.fileName.ClassName` triple match |
 | Hot-reload doesn't pick up changes | Changed global var, new class, or new file | Save → exit to menu → re-enter world |
-| `AttributeError: 'NoneType' object has no attribute` | `GetComponent` returned None | Check entity exists; use `CreateComponent` first |
-| Event callback never fires | Wrong event name or system name | Use exact event name from docs; verify `GetEngineSystemName()` |
-| Server component not working on client | Server/client isolation violated | Move logic to correct side; use custom events if cross-side |
-| `KeyError` in event callback | Event param name differs from docs | Check [[api-events]] for exact parameter names |
-| Chinese text garbled in logs | Missing UTF-8 header | Add `# -*- coding: utf-8 -*-` at top of file |
-| Mod works in editor but not after publish | UUID collision or missing files | Regenerate UUIDs; verify all files included in pack |
-| Mod upload fails with "打包失败" | Python syntax error, or path too deep (>150 chars) | Check Python syntax; shorten directory nesting |
-| Mod fails loading on mobile/console | Filenames contain Chinese or special chars | Rename all files/folders to ASCII only (no Chinese in behavior_pack/resource_pack) |
-| `JSON format error (code 3001)` | Malformed JSON in addon config | Use VSCode to open JSON — red squiggles show errors |
-| `Custom item ID error (code 5001)` | Item identifier mismatch | Verify namespace:name format matches between JSON and code |
-| `ItemDict` silently not working | Missing or wrong key names | Use exact keys: `itemName` (not `item_name`), `count`, `auxValue` |
+| `AttributeError: 'NoneType' has no attribute` | `GetComponent` returned None | Use `CreateComponent` (auto-gets if exists) |
+| Event callback never fires | Wrong event name or system name | Exact name from [[api-events]]; check `GetEngineSystemName()` |
+| `KeyError` in event callback | Event param name differs | Check [[api-events]]; `id` vs `playerId` varies per event |
+| Chinese text garbled in logs | Missing UTF-8 header | Add `# -*- coding: utf-8 -*-` at top of every file |
+| Works in editor, broken after publish | UUID collision or path >150 chars | Regenerate UUIDs; shorten directory nesting |
+| Upload "打包失败" | Python syntax error or path depth | Fix syntax; rename deep folders |
+| Mobile load failure | Chinese/funky filenames in packs | ASCII-only filenames in behavior_pack/resource_pack |
+| `JSON format error (code 3001/3002)` | Malformed JSON in config | VSCode shows red squiggles at error position |
+| `Custom item ID error (code 5001)` | Identifier missing namespace | Must be `"mymod:item_name"` not `"item_name"` |
+| `ItemDict` silently not working | Wrong key names | Use `newItemName`/`newAuxValue` (modern) or `itemName`/`auxValue` (legacy) |
+
+## Color Codes
+
+| Code | Effect | Code | Effect |
+|---|---|---|---|
+| `§0`-`§f` | 16 colors (0=black, f=white) | `§l` | **Bold** |
+| `§a` | Green | `§c` | Red |
+| `§e` | Yellow | `§6` | Gold |
+| `§k` | Obfuscated | `§m` | ~~Strikethrough~~ |
+| `§n` | <u>Underline</u> | `§o` | *Italic* |
+| `§r` | Reset all formatting | | |
+
+> `"§c§lBOSS DEFEATED!§r"` = bold red, then reset. Full table: [[api-components]] Enums.
 
 ## Manifest Format
 
