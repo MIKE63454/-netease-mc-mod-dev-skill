@@ -141,9 +141,11 @@ comp = serverApi.GetEngineCompFactory().CreateItem(entityId)
 
 | Method | Parameters | Returns | Description |
 |---|---|---|---|
+| `GetPlayerAllItems(posType, getUserData?)` | posType(ItemPosType), getUserData(bool) | list(dict)/None | **Get all player items at once (CORRECT API for inventory).** Returns list of 36 items for INVENTORY, 4 for ARMOR. Empty slots are `None`. |
+| `GetPlayerItem(posType, slotPos, getUserData?)` | posType(ItemPosType), slotPos(int), getUserData(bool) | dict/None | **Get single player item (CORRECT API for players).** Returns `None` if slot is empty. |
 | `SpawnItemToPlayerInv(itemDict, playerId, slotPos?)` | itemDict(dict), playerId(str), slotPos(int, optional) | bool | Spawn item to player inventory. If slotPos omitted, auto-finds best slot. |
 | `SpawnItemToPlayerCarried(itemDict, playerId)` | itemDict(dict), playerId(str) | bool | Spawn item to player's main hand |
-| `GetEntityItem(posType, slotPos, getUserData?)` | posType(ItemPosType), slotPos(int), getUserData(bool) | dict/None | Get item info from entity slot |
+| `GetEntityItem(posType, slotPos, getUserData?)` | posType(ItemPosType), slotPos(int), getUserData(bool) | dict/None | Get item from non-player entity slot (donkey, zombie, etc.) or CARRIED. **Does NOT work for player INVENTORY — use GetPlayerAllItems instead.** |
 | `SetEntityItem(posType, slotPos, itemDict)` | posType(ItemPosType), slotPos(int), itemDict(dict) | bool | Set item in entity slot |
 | `AddEnchantToInvItem(slotPos, enchantType, level)` | slotPos(int), enchantType(int), level(int) | bool | Add enchant to inventory item |
 | `GetEquItemEnchant(slotPos)` | slotPos(ArmorSlotType) | list(tuple)/None | Get enchant list on equipped armor |
@@ -385,6 +387,55 @@ class EffectType:
     CONDUIT_POWER = "conduit_power"     # Underwater benefits
     DARKNESS = "darkness"               # Screen darkening, limited vision
 ```
+
+### Effect Component Methods (CreateEffect)
+
+```python
+comp = serverApi.GetEngineCompFactory().CreateEffect(entityId)
+```
+
+| Method | Parameters | Returns | Description |
+|---|---|---|---|
+| `AddEffectToEntity(effectName, duration, amplifier, showParticles)` | effectName(str), duration(float), amplifier(int), showParticles(bool) | bool | **CRITICAL order: name → duration → amplifier → particles.** NOT name → amp → dur. `amplifier`: 0=level I, 1=level II, etc. |
+| `RemoveEffectFromEntity(effectName)` | effectName(str) | bool | Remove a status effect from entity |
+
+**Usage:**
+```python
+comp = serverApi.GetEngineCompFactory().CreateEffect(playerId)
+# Apply Slowness III (amplifier=2) for 30 seconds, no particles
+comp.AddEffectToEntity("slowness", 30.0, 2, False)
+# Apply Speed I for 30 seconds
+comp.AddEffectToEntity("speed", 30.0, 0, False)
+# Apply Mining Fatigue I for 30 seconds
+comp.AddEffectToEntity("mining_fatigue", 30.0, 0, False)
+# Remove effect
+comp.RemoveEffectFromEntity("slowness")
+```
+
+> **Common pitfall:** Reversing `duration` and `amplifier` (e.g., `AddEffectToEntity("slowness", 2, 30.0)`) causes the effect to expire almost instantly while applying an extreme amplifier level.
+
+### PlayerOperation Component (Legacy Pattern)
+
+Detect player movement states. No factory equivalent — use legacy `CreateComponent`:
+
+```python
+comp = serverApi.CreateComponent(playerId, "Minecraft", "playerOperation")
+```
+
+| Method | Returns | Description |
+|---|---|---|
+| `IsSprinting()` | bool | Player is sprinting (Ctrl + forward) |
+| `IsSwimming()` | bool | Player is swimming |
+| `IsMoving()` | bool | Player is moving (walking/sprinting/swimming) |
+| `IsJumping()` | bool | Player is in the air from a jump |
+| `IsSneaking()` | bool | Player is sneaking/crouching |
+| `IsInWater()` | bool | Player's hitbox intersects water |
+| `IsInLava()` | bool | Player is in lava |
+| `IsFlying()` | bool | Player is flying (creative/elytra) |
+| `IsOnGround()` | bool | Player is standing on ground |
+| `IsSleeping()` | bool | Player is in a bed |
+| `IsRiding()` | bool | Player is riding an entity |
+| `IsOnLadder()` | bool | Player is on a ladder/vine |
 
 ### EnchantType (enchantment IDs)
 

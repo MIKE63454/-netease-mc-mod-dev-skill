@@ -6,20 +6,20 @@
 
 | Event | Trigger | Key Parameters |
 |---|---|---|
-| `AddServerPlayerEvent` | Player joins game | `id`(str): playerId |
+| `AddServerPlayerEvent` | Player joins game | `id`(str): playerId. **May NOT fire in singleplayer — player entity created before scripts load.** Use `AddEntityServerEvent` as fallback. |
 | `DelServerPlayerEvent` | Player removed | `id`(str): playerId |
 | `ServerChatEvent` | Player sends chat message | `username`(str), `playerId`(str), `message`(str), `cancel`(bool), `bChatById`(bool) |
 | `ClientLoadAddonsFinishServerEvent` | Client finishes loading mods | (no key params, use to send init data to client) |
 | `ChunkGeneratedServerEvent` | Chunk generation complete | `dimensionId`(int), `chunkPosX`(int), `chunkPosZ`(int) |
 | `ChunkLoadedServerEvent` | Chunk loaded | `dimensionId`(int), `chunkPosX`(int), `chunkPosZ`(int) |
 | `EntityRemoveEvent` | Entity removed | `id`(str): entityId |
-| `AddEntityServerEvent` | Entity created/loaded from save | `id`(str), `posX`(float), `posY`(float), `posZ`(float), `dimensionId`(int), `isBaby`(bool), `engineTypeStr`(str) |
+| `AddEntityServerEvent` | Entity created/loaded from save | `id`(str), `posX`(float), `posY`(float), `posZ`(float), `dimensionId`(int), `isBaby`(bool), `engineTypeStr`(str). **`engineTypeStr` = "minecraft:player" for players — reliable singleplayer fallback.** |
 | `ServerSpawnMobEvent` | Mob spawned (auto or API) | `entityId`(str), `engineTypeStr`(str) |
 | `ExplosionServerEvent` | Explosion occurs | `center`(tuple), `radius`(float) |
 | `CommandEvent` | Player executes command | `playerId`(str), `command`(str) |
 | `PlayerJoinMessageEvent` | "X joined game" message about to display | `playerId`(str) |
 | `PlayerLeftMessageServerEvent` | "X left game" message about to display | `playerId`(str) |
-| `OnScriptTickServer` | Server tick (30/sec) | (none) |
+| `OnScriptTickServer` | Server tick (30/sec) | **(none — callback receives 0 args). CRITICAL: use `def OnTick(self, args=None)`** |
 | `LoadServerAddonScriptsAfter` | Server done loading mods | (none) |
 
 ### Player Events (玩家)
